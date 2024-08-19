@@ -531,7 +531,7 @@ export default function MapScreen() {
               longitude: 103.8198, // Central Singapore longitude
             }}
           >
-            <Ionicons name="person-circle" size={40} color="lightblue" />
+            <Ionicons name="person-circle" size={40} color="white" />
           </Marker>
 
           {filteredLocations.map((location, index) => (
