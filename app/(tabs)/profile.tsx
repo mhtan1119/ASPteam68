@@ -1,10 +1,19 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons'; // Import vector icons
+import { StackScreenProps } from '@react-navigation/stack';
 
+// Define the type for your stack's navigation
+type RootStackParamList = {
+  profile: undefined;
+  editprofile: undefined;
+};
 
-export default function ProfilePage({ navigation }) {
-  const handleEditProfile = () => {
+// Define the type for the props in ProfilePage
+type ProfilePageProps = StackScreenProps<RootStackParamList, 'profile'>;
+
+export default function ProfilePage({ navigation }: ProfilePageProps) {
+  const handleeditprofile = () => {
     // Navigate to the Edit Profile page
     navigation.navigate('editprofile'); // Ensure 'EditProfile' is the correct route name
   };
