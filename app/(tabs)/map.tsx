@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import MapView, { Marker, Callout, Region } from "react-native-maps";
 import { ThemedView } from "@/components/ThemedView";
-import Ionicons from "react-native-vector-icons/Ionicons"; // Assuming you handled the import as discussed
+import Ionicons from "react-native-vector-icons/Ionicons";
 
 // Define the Location interface
 interface Location {
@@ -21,7 +21,7 @@ interface Location {
   longitude: number;
   address: string;
   hours: string;
-  phone: string; // Add phone number field
+  phone: string;
 }
 
 export default function MapScreen() {
@@ -644,7 +644,6 @@ export default function MapScreen() {
                 <Text style={styles.modalText}>
                   Phone: {selectedLocation.phone}
                 </Text>
-                {/* Add any additional info here */}
               </View>
             </View>
           </Modal>
@@ -657,6 +656,7 @@ export default function MapScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "lightblue", // Overall background to blue
   },
   searchLabelContainer: {
     marginTop: 120, // Adjust as needed
@@ -664,11 +664,12 @@ const styles = StyleSheet.create({
     right: 10,
     zIndex: 2,
     alignItems: "flex-start",
+    backgroundColor: "lightblue", // Set background color to blue
   },
   searchLabel: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "white",
+    color: "black",
   },
   searchContainer: {
     marginTop: 10, // Adjust as needed to position below the label
@@ -717,6 +718,8 @@ const styles = StyleSheet.create({
     left: 20, // Moved to the left
     flexDirection: "column",
     gap: 10,
+    padding: 10, // Optional: Add padding if needed
+    borderRadius: 10, // Optional: Add border radius for rounded corners
   },
   recenterButton: {
     width: 50,
@@ -877,7 +880,7 @@ const styles = StyleSheet.create({
   buttonLabel: {
     marginTop: 5,
     fontSize: 12,
-    color: "white",
+    color: "black",
     textAlign: "center",
   },
   modalContainer: {
