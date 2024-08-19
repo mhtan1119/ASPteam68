@@ -673,7 +673,7 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     marginTop: 10, // Adjust as needed to position below the label
-    left: 10,
+    left: 0,
     right: 10,
     zIndex: 2,
     flexDirection: "row",
@@ -717,6 +717,7 @@ const styles = StyleSheet.create({
     bottom: 20,
     left: 20, // Moved to the left
     flexDirection: "column",
+
     gap: 10,
     padding: 10, // Optional: Add padding if needed
     borderRadius: 10, // Optional: Add border radius for rounded corners

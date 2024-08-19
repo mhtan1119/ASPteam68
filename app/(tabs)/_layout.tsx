@@ -12,6 +12,9 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+        tabBarStyle: {
+          backgroundColor: "lightblue", // Set the background color to light blue
+        },
         headerShown: false,
       }}
     >
