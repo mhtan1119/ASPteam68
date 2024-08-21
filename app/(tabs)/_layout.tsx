@@ -19,6 +19,16 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
+        name="medtracking"
+        options={{
+          title: 'MedTracking',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'person' : 'person-outline'} color={color} />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
         name="index"
         options={{
           title: "Home",
