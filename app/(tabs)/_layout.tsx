@@ -13,7 +13,7 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
         tabBarStyle: {
-          backgroundColor: "lightblue", // Set the background color to light blue
+          backgroundColor: "lightblue",
         },
         headerShown: false,
       }}
@@ -21,13 +21,15 @@ export default function TabLayout() {
       <Tabs.Screen
         name="medtracking"
         options={{
-          title: 'MedTracking',
+          title: "MedTracking",
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'person' : 'person-outline'} color={color} />
+            <TabBarIcon
+              name={focused ? "person" : "person-outline"}
+              color={color}
+            />
           ),
         }}
       />
-
       <Tabs.Screen
         name="index"
         options={{
@@ -64,18 +66,33 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Profile',
+          title: "Profile",
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'person' : 'person-outline'} color={color} />
+            <TabBarIcon
+              name={focused ? "person" : "person-outline"}
+              color={color}
+            />
           ),
         }}
       />
       <Tabs.Screen
         name="booking"
         options={{
-          title: 'Booking',
+          title: "Booking",
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'calendar' : 'calendar-outline'} color={color} />
+            <TabBarIcon
+              name={focused ? "calendar" : "calendar-outline"}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="test"
+        options={{
+          title: "Test",
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? "bug" : "bug-outline"} color={color} />
           ),
         }}
       />

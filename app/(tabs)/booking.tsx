@@ -238,7 +238,11 @@ export default function Booking() {
               onValueChange={(itemValue) => setTempTime(itemValue)}
             >
               {timeOptions.map((timeOption, index) => (
-                <Picker.Item label={timeOption} value={timeOption} key={index} />
+                <Picker.Item
+                  label={timeOption}
+                  value={timeOption}
+                  key={index}
+                />
               ))}
             </Picker>
             <Button title="Select" onPress={handleTimeSelect} />
@@ -255,7 +259,9 @@ export default function Booking() {
         <TextInput placeholder="Remarks" style={styles.input} />
 
         {/* Symptoms Radio Buttons */}
-        <Text style={styles.label}>Do you have any of the following symptoms:</Text>
+        <Text style={styles.label}>
+          Do you have any of the following symptoms:
+        </Text>
         <Text style={styles.symptomsText}>
           Fever, Cough, Sore Throat, Runny Nose
         </Text>
