@@ -19,12 +19,12 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="medtracking"
+        name="explore"
         options={{
-          title: "MedTracking",
+          title: "Explore",
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
-              name={focused ? "person" : "person-outline"}
+              name={focused ? "code-slash" : "code-slash-outline"}
               color={color}
             />
           ),
@@ -43,12 +43,24 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="medtracking"
         options={{
-          title: "Explore",
+          title: "MedTracking",
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
-              name={focused ? "code-slash" : "code-slash-outline"}
+              name={focused ? "person" : "person-outline"}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="booking"
+        options={{
+          title: "Booking",
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon
+              name={focused ? "calendar" : "calendar-outline"}
               color={color}
             />
           ),
@@ -70,18 +82,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
               name={focused ? "person" : "person-outline"}
-              color={color}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="booking"
-        options={{
-          title: "Booking",
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon
-              name={focused ? "calendar" : "calendar-outline"}
               color={color}
             />
           ),
