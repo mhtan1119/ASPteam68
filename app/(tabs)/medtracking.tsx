@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { SafeAreaView, TouchableOpacity, Text, View } from 'react-native';
+import { StyleSheet, View, SafeAreaView, TouchableOpacity, Text } from 'react-native';
+import moment from 'moment';
 
 const Index = () => {
   const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -14,7 +15,7 @@ const Index = () => {
     daysOfWeek[(currentDayIndex + 2) % 7],
   ];
 
-  const [selectedDayIndex, setSelectedDayIndex] = useState(2); // Start with the middle day selected
+  const [selectedDayIndex, setSelectedDayIndex] = useState<number>(2); // Start with the middle day selected
   const [firstMedicationStatus, setFirstMedicationStatus] = useState<string>(''); // '', 'tick', 'cross'
   const [secondMedicationStatus, setSecondMedicationStatus] = useState<string>(''); // '', 'tick', 'cross'
 
@@ -33,62 +34,63 @@ const Index = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <View className="p-4 bg-white items-center">
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
         {/* Date Display */}
-        <Text className="text-lg text-black mb-4 text-center">
-          Today, {orderedDays[selectedDayIndex]}, {today.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+        <Text style={styles.dateDisplay}>
+          {orderedDays[selectedDayIndex]}, {moment().add(selectedDayIndex - 2, 'days').format('D MMM')}
         </Text>
 
         {/* Day Circles */}
-        <View className="flex-row justify-between mb-4 w-full max-w-xs">
+        <View style={styles.dayCircles}>
           {orderedDays.map((day, index) => (
             <TouchableOpacity
               key={index}
-              className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                index === selectedDayIndex ? 'bg-[#83B4FF]' : 'bg-black'
-              }`}
+              style={[
+                styles.dayCircle,
+                index === selectedDayIndex && styles.selectedDayCircle,
+              ]}
               onPress={() => handleDayPress(index)}
             >
-              <Text className="text-white">{day.slice(0, 3)}</Text>
+              <Text style={styles.dayText}>{day.slice(0, 3)}</Text>
             </TouchableOpacity>
           ))}
         </View>
 
         {/* Add Medication Button */}
-        <TouchableOpacity className="bg-[#83B4FF] py-3 px-6 rounded-lg mt-4 shadow-lg">
-          <Text className="text-white text-center font-bold">
-            <Text className="text-lg font-bold mr-2">+</Text> Add Medication
+        <TouchableOpacity style={styles.addButton}>
+          <Text style={styles.addButtonText}>
+            <Text style={styles.plusSign}>+</Text> Add Medication
           </Text>
         </TouchableOpacity>
 
         {/* Time Label */}
-        <Text className="mt-4 text-lg font-bold text-black self-start">8:30</Text>
+        <Text style={styles.timeLabel}>8:30</Text>
 
         {/* Medication Items */}
-        <View className="mt-2 w-full">
-          <TouchableOpacity className="bg-[#E5F0FF] py-3 px-4 rounded-lg mt-2 flex-row items-center shadow-md">
+        <View style={styles.medicationItemsContainer}>
+          <TouchableOpacity style={styles.medicationItem}>
             <TouchableOpacity
-              className="w-7 h-7 rounded-md border border-black flex items-center justify-center mr-4"
+              style={styles.checkbox}
               onPress={() => toggleStatus(firstMedicationStatus, setFirstMedicationStatus)}
             >
-              <Text className="text-lg">
+              <Text style={styles.checkboxText}>
                 {firstMedicationStatus === 'tick' ? '✔️' : firstMedicationStatus === 'cross' ? '❌' : ''}
               </Text>
             </TouchableOpacity>
-            <Text className="text-base text-black">Paracetamol, 250 mg</Text>
+            <Text style={styles.medicationText}>Paracetamol, 250 mg</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity className="bg-[#E5F0FF] py-3 px-4 rounded-lg mt-2 flex-row items-center shadow-md">
+          <TouchableOpacity style={styles.medicationItem}>
             <TouchableOpacity
-              className="w-7 h-7 rounded-md border border-black flex items-center justify-center mr-4"
+              style={styles.checkbox}
               onPress={() => toggleStatus(secondMedicationStatus, setSecondMedicationStatus)}
             >
-              <Text className="text-lg">
+              <Text style={styles.checkboxText}>
                 {secondMedicationStatus === 'tick' ? '✔️' : secondMedicationStatus === 'cross' ? '❌' : ''}
               </Text>
             </TouchableOpacity>
-            <Text className="text-base text-black">Losartan, 400 mg</Text>
+            <Text style={styles.medicationText}>Losartan, 400 mg</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -97,3 +99,109 @@ const Index = () => {
 };
 
 export default Index;
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  container: {
+    padding: 16,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center', // Center content horizontally
+  },
+  dateDisplay: {
+    fontSize: 20,
+    color: '#000000',
+    marginBottom: 16,
+    textAlign: 'center', // Center text horizontally
+  },
+  dayCircles: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16, // Keep the spacing below the circles as before
+    width: '100%',
+    maxWidth: 300, // Limit width to keep circles centered
+  },
+  dayCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#000000',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  selectedDayCircle: {
+    backgroundColor: '#83B4FF',
+  },
+  dayText: {
+    color: '#FFFFFF',
+  },
+  addButton: {
+    backgroundColor: '#83B4FF',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    marginTop: 16, // Keep the spacing close to the day circles
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5, // For Android shadow
+  },
+  addButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  plusSign: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginRight: 8, // Add space between + sign and text
+  },
+  timeLabel: {
+    marginTop: 16, // Add more top padding to the time label
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#000000',
+    textAlign: 'left', // Align the time label to the left
+    alignSelf: 'flex-start', // Make sure the time label stays on the left
+  },
+  medicationItemsContainer: {
+    marginTop: 8, // Reduced spacing between the time label and the medication items
+    width: '100%', // Make sure the container takes the full width
+  },
+  medicationItem: {
+    backgroundColor: '#E5F0FF',
+    paddingVertical: 12, // Reduced padding
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    marginTop: 8,
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 5, // For Android shadow
+  },
+  checkbox: {
+    width: 30,
+    height: 30,
+    borderRadius: 5,
+    borderColor: '#000000',
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
+  },
+  checkboxText: {
+    fontSize: 18,
+  },
+  medicationText: {
+    fontSize: 16,
+    color: '#000000',
+  },
+});
