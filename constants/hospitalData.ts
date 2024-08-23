@@ -325,3 +325,14 @@ export const allLocations: HospitalLocation[] = [
   ...privateHospitals,
   ...publicHospitals,
 ];
+
+// Services offered
+export const services = [
+  "Doctor Consultation",
+  "Health Plan Discussion",
+  "Vaccination",
+  "Child Immunization",
+  "Diabetic Eye Screening",
+  "Diabetic Foot Screening",
+  "Dental Services",
+];

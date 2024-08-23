@@ -15,6 +15,14 @@ import RadioForm from "react-native-simple-radio-button";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { styled } from "nativewind";
 import { SQLiteProvider, useSQLiteContext } from "expo-sqlite";
+import {
+  HospitalLocation,
+  allLocations,
+  polyclinics,
+  privateHospitals,
+  publicHospitals,
+  services,
+} from "@/constants/hospitalData";
 
 const StyledSafeAreaView = styled(SafeAreaView);
 const StyledScrollView = styled(ScrollView);
@@ -44,7 +52,7 @@ const initializeDatabase = async (db: any) => {
 
 export default function App() {
   return (
-    <SQLiteProvider databaseName="appointment5.db" onInit={initializeDatabase}>
+    <SQLiteProvider databaseName="appointment6.db" onInit={initializeDatabase}>
       <Booking />
     </SQLiteProvider>
   );
@@ -53,45 +61,8 @@ export default function App() {
 function Booking() {
   const db = useSQLiteContext();
 
-  const healthcareFacilityNames = [
-    "Ang Mo Kio Polyclinic",
-    "Bedok Polyclinic",
-    "Bukit Batok Polyclinic",
-    "Bukit Merah Polyclinic",
-    "Choa Chu Kang Polyclinic",
-    "Clementi Polyclinic",
-    "Geylang Polyclinic",
-    "Hougang Polyclinic",
-    "Jurong Polyclinic",
-    "Marine Parade Polyclinic",
-    "Outram Polyclinic",
-    "Pasir Ris Polyclinic",
-    "Punggol Polyclinic",
-    "Queenstown Polyclinic",
-    "Sengkang Polyclinic",
-    "Tampines Polyclinic",
-    "Toa Payoh Polyclinic",
-    "Woodlands Polyclinic",
-    "Yishun Polyclinic",
-    "Mount Elizabeth Hospital",
-    "Gleneagles Hospital",
-    "Raffles Hospital",
-    "Mount Alvernia Hospital",
-    "Parkway East Hospital",
-    "Farrer Park Hospital",
-    "Thomson Medical Centre",
-    "Mount Elizabeth Novena Hospital",
-    "East Shore Hospital",
-    "Bright Vision Hospital",
-    "Singapore General Hospital",
-    "Tan Tock Seng Hospital",
-    "National University Hospital",
-    "Changi General Hospital",
-    "Khoo Teck Puat Hospital",
-    "Ng Teng Fong General Hospital",
-    "Sengkang General Hospital",
-    "KK Women's and Children's Hospital",
-  ];
+  // Extract healthcare facility names dynamically from the imported data
+  const healthcareFacilityNames = allLocations.map((location) => location.name);
 
   const timeOptions = [];
   for (let h = 8; h <= 17; h++) {
@@ -194,28 +165,13 @@ function Booking() {
               selectedValue={tempService}
               onValueChange={(itemValue) => setTempService(itemValue)}
             >
-              <Picker.Item
-                label="Doctor Consultation"
-                value="Doctor Consultation"
-              />
-              <Picker.Item
-                label="Health Plan Discussion"
-                value="Health Plan Discussion"
-              />
-              <Picker.Item label="Vaccination" value="Vaccination" />
-              <Picker.Item
-                label="Child Immunization"
-                value="Child Immunization"
-              />
-              <Picker.Item
-                label="Diabetic Eye Screening"
-                value="Diabetic Eye Screening"
-              />
-              <Picker.Item
-                label="Diabetic Foot Screening"
-                value="Diabetic Foot Screening"
-              />
-              <Picker.Item label="Dental Services" value="Dental Services" />
+              {services.map((serviceItem, index) => (
+                <Picker.Item
+                  label={serviceItem}
+                  value={serviceItem}
+                  key={index}
+                />
+              ))}
             </Picker>
             <StyledTouchableOpacity
               className="bg-blue-500 p-2 rounded mt-4"
