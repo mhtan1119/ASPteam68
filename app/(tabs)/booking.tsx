@@ -8,11 +8,13 @@ import {
   ScrollView,
   Platform,
   SafeAreaView,
+  Alert,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import RadioForm from "react-native-simple-radio-button";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { styled } from "nativewind";
+import { SQLiteProvider, useSQLiteContext } from "expo-sqlite";
 
 const StyledSafeAreaView = styled(SafeAreaView);
 const StyledScrollView = styled(ScrollView);
@@ -21,44 +23,109 @@ const StyledTextInput = styled(TextInput);
 const StyledTouchableOpacity = styled(TouchableOpacity);
 const StyledView = styled(View);
 
-export default function Booking() {
+// Initialize the database
+const initializeDatabase = async (db: any) => {
+  try {
+    await db.execAsync(`
+      CREATE TABLE IF NOT EXISTS appointments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        service TEXT,
+        location TEXT,
+        date TEXT,
+        time TEXT,
+        remarks TEXT
+      );
+    `);
+    console.log("Database initialized!");
+  } catch (error) {
+    console.log("Error while initializing the database:", error);
+  }
+};
+
+export default function App() {
+  return (
+    <SQLiteProvider databaseName="appointment5.db" onInit={initializeDatabase}>
+      <Booking />
+    </SQLiteProvider>
+  );
+}
+
+function Booking() {
+  const db = useSQLiteContext();
+
   const healthcareFacilityNames = [
     "Ang Mo Kio Polyclinic",
+
     "Bedok Polyclinic",
+
     "Bukit Batok Polyclinic",
+
     "Bukit Merah Polyclinic",
+
     "Choa Chu Kang Polyclinic",
+
     "Clementi Polyclinic",
+
     "Geylang Polyclinic",
+
     "Hougang Polyclinic",
+
     "Jurong Polyclinic",
+
     "Marine Parade Polyclinic",
+
     "Outram Polyclinic",
+
     "Pasir Ris Polyclinic",
+
     "Punggol Polyclinic",
+
     "Queenstown Polyclinic",
+
     "Sengkang Polyclinic",
+
     "Tampines Polyclinic",
+
     "Toa Payoh Polyclinic",
+
     "Woodlands Polyclinic",
+
     "Yishun Polyclinic",
+
     "Mount Elizabeth Hospital",
+
     "Gleneagles Hospital",
+
     "Raffles Hospital",
+
     "Mount Alvernia Hospital",
+
     "Parkway East Hospital",
+
     "Farrer Park Hospital",
+
     "Thomson Medical Centre",
+
     "Mount Elizabeth Novena Hospital",
+
     "East Shore Hospital",
+
     "Bright Vision Hospital",
+
     "Singapore General Hospital",
+
     "Tan Tock Seng Hospital",
+
     "National University Hospital",
+
     "Changi General Hospital",
+
     "Khoo Teck Puat Hospital",
+
     "Ng Teng Fong General Hospital",
+
     "Sengkang General Hospital",
+
     "KK Women's and Children's Hospital",
   ];
 
@@ -114,6 +181,25 @@ export default function Booking() {
     const currentDate = selectedDate || date;
     setShowDatePicker(Platform.OS === "ios");
     setDate(currentDate);
+  };
+
+  const handleSaveAppointment = async () => {
+    if (!service || !location || !date || !time) {
+      Alert.alert("Error", "Please fill in all the fields.");
+      return;
+    }
+
+    const formattedDate = date.toISOString().split("T")[0];
+
+    try {
+      await db.runAsync(
+        "INSERT INTO appointments (service, location, date, time, remarks) VALUES (?, ?, ?, ?, ?);",
+        [service, location, formattedDate, time, remarks]
+      );
+      Alert.alert("Success", "Appointment saved successfully.");
+    } catch (error) {
+      console.log("Error saving appointment:", error);
+    }
   };
 
   return (
@@ -321,7 +407,10 @@ export default function Booking() {
           />
         )}
 
-        <StyledTouchableOpacity className="bg-blue-500 py-2 rounded mt-5">
+        <StyledTouchableOpacity
+          className="bg-blue-500 py-2 rounded mt-5"
+          onPress={handleSaveAppointment}
+        >
           <StyledText className="text-white text-center text-lg">
             Submit
           </StyledText>

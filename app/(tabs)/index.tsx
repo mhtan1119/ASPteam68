@@ -1,74 +1,84 @@
-import { Image, StyleSheet, Platform } from "react-native";
+import React, { useEffect, useState, useCallback } from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
+import { SQLiteProvider, useSQLiteContext } from "expo-sqlite";
 
-import { HelloWave } from "@/components/HelloWave";
-import ParallaxScrollView from "@/components/ParallaxScrollView";
-import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
+const UserListScreen: React.FC = () => {
+  const db = useSQLiteContext();
+  const [nextAppointment, setNextAppointment] = useState<{
+    date: string;
+    time: string;
+  } | null>(null);
 
-export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }}
-      headerImage={
-        <Image
-          source={require("@/assets/images/partial-react-logo.png")}
-          style={styles.reactLogo}
-        />
+  const fetchAppointments = async () => {
+    try {
+      const result = await db.getAllAsync(
+        "SELECT date, time FROM appointments ORDER BY date ASC, time ASC LIMIT 1;"
+      );
+      const appointmentList = (result as { date: string; time: string }[]).map(
+        (row) => ({
+          date: row.date,
+          time: row.time,
+        })
+      );
+
+      // Set the earliest appointment as the next appointment
+      if (appointmentList.length > 0) {
+        setNextAppointment(appointmentList[0]);
       }
-    >
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit{" "}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText>{" "}
-          to see changes. Press{" "}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: "cmd + d", android: "cmd + m" })}
-          </ThemedText>{" "}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this
-          starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{" "}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText>{" "}
-          to get a fresh <ThemedText type="defaultSemiBold">app</ThemedText>{" "}
-          directory. This will move the current{" "}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{" "}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    } catch (error) {
+      console.log("Error fetching appointments:", error);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchAppointments();
+    }, [])
   );
-}
+
+  return (
+    <View style={styles.container}>
+      {nextAppointment && (
+        <View style={styles.banner}>
+          <Text style={styles.bannerText}>
+            Your next appointment is on: {nextAppointment.date} at{" "}
+            {nextAppointment.time}
+          </Text>
+        </View>
+      )}
+    </View>
+  );
+};
+
+const App: React.FC = () => {
+  return (
+    <SQLiteProvider databaseName="appointment5.db">
+      <UserListScreen />
+    </SQLiteProvider>
+  );
+};
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: "row",
+  container: {
+    flex: 1,
     alignItems: "center",
-    gap: 8,
+    justifyContent: "center",
+    backgroundColor: "#fff",
+    padding: 16,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  banner: {
+    backgroundColor: "#ffcc00",
+    padding: 10,
+    borderRadius: 5,
+    width: "100%",
+    alignItems: "center",
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: "absolute",
+  bannerText: {
+    color: "#333",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
+
+export default App;
