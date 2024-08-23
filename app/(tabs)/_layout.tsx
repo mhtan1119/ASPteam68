@@ -1,7 +1,6 @@
 import { Tabs } from "expo-router";
 import React from "react";
-
-import { TabBarIcon } from "@/components/navigation/TabBarIcon";
+import { Ionicons } from "@expo/vector-icons"; // Import Ionicons
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 
@@ -11,9 +10,10 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+        tabBarActiveTintColor: "#8c8c8c", // Set active tint color to gray
+        tabBarInactiveTintColor: "#FFFFFF", // Set inactive tint color to white
         tabBarStyle: {
-          backgroundColor: "lightblue",
+          backgroundColor: "#3F5F90", // Set the background color to your desired color
         },
         headerShown: false,
       }}
@@ -22,10 +22,11 @@ export default function TabLayout() {
         name="explore"
         options={{
           title: "Explore",
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon
-              name={focused ? "code-slash" : "code-slash-outline"}
-              color={color}
+          tabBarIcon: ({ color }) => (
+            <Ionicons
+              name="code-slash"
+              color={color} // Use the color prop for consistency with the tint colors
+              size={24}
             />
           ),
         }}
@@ -34,10 +35,11 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Home",
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon
-              name={focused ? "home" : "home-outline"}
-              color={color}
+          tabBarIcon: ({ color }) => (
+            <Ionicons
+              name="home"
+              color={color} // Use the color prop for consistency with the tint colors
+              size={24}
             />
           ),
         }}
@@ -45,11 +47,12 @@ export default function TabLayout() {
       <Tabs.Screen
         name="medtracking"
         options={{
-          title: "MedTracking",
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon
-              name={focused ? "person" : "person-outline"}
-              color={color}
+          title: "Medication",
+          tabBarIcon: ({ color }) => (
+            <Ionicons
+              name="medkit"
+              color={color} // Use the color prop for consistency with the tint colors
+              size={24}
             />
           ),
         }}
@@ -57,11 +60,12 @@ export default function TabLayout() {
       <Tabs.Screen
         name="booking"
         options={{
-          title: "Booking",
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon
-              name={focused ? "calendar" : "calendar-outline"}
-              color={color}
+          title: "Appointment",
+          tabBarIcon: ({ color }) => (
+            <Ionicons
+              name="calendar"
+              color={color} // Use the color prop for consistency with the tint colors
+              size={24}
             />
           ),
         }}
@@ -70,8 +74,12 @@ export default function TabLayout() {
         name="map"
         options={{
           title: "Map",
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? "map" : "map-outline"} color={color} />
+          tabBarIcon: ({ color }) => (
+            <Ionicons
+              name="map"
+              color={color} // Use the color prop for consistency with the tint colors
+              size={24}
+            />
           ),
         }}
       />
@@ -79,10 +87,11 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: "Profile",
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon
-              name={focused ? "person" : "person-outline"}
-              color={color}
+          tabBarIcon: ({ color }) => (
+            <Ionicons
+              name="person"
+              color={color} // Use the color prop for consistency with the tint colors
+              size={24}
             />
           ),
         }}
@@ -91,8 +100,12 @@ export default function TabLayout() {
         name="test"
         options={{
           title: "Test",
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? "bug" : "bug-outline"} color={color} />
+          tabBarIcon: ({ color }) => (
+            <Ionicons
+              name="bug"
+              color={color} // Use the color prop for consistency with the tint colors
+              size={24}
+            />
           ),
         }}
       />

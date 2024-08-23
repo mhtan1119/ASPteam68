@@ -53,7 +53,7 @@ const UserListScreen: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <SQLiteProvider databaseName="appointment6.db">
+    <SQLiteProvider databaseName="appointment7.db">
       <UserListScreen />
     </SQLiteProvider>
   );

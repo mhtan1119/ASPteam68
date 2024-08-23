@@ -52,7 +52,7 @@ const initializeDatabase = async (db: any) => {
 
 export default function App() {
   return (
-    <SQLiteProvider databaseName="appointment6.db" onInit={initializeDatabase}>
+    <SQLiteProvider databaseName="appointment7.db" onInit={initializeDatabase}>
       <Booking />
     </SQLiteProvider>
   );
@@ -140,7 +140,7 @@ function Booking() {
   return (
     <StyledSafeAreaView className="flex-1 bg-gray-100">
       <StyledScrollView className="p-5">
-        <StyledText className="text-2xl font-bold mb-5 text-center">
+        <StyledText className="text-2xl font-bold mb-5 text-center bg-customBlue2 text-white py-3 rounded">
           APPOINTMENTS
         </StyledText>
 
@@ -328,7 +328,7 @@ function Booking() {
         )}
 
         <StyledTouchableOpacity
-          className="bg-blue-500 py-2 rounded mt-5"
+          className="bg-customBlue py-2 rounded mt-5"
           onPress={handleSaveAppointment}
         >
           <StyledText className="text-white text-center text-lg">

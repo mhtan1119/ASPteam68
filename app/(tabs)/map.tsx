@@ -153,7 +153,7 @@ export default function MapScreen() {
 
   return (
     <TouchableWithoutFeedback onPress={handleScreenPress}>
-      <ThemedView className="flex-1 bg-sky-200">
+      <ThemedView className="flex-1 bg-customBlue">
         <View className="mt-28 mx-2">
           <Text className="text-lg font-bold text-black">Search</Text>
         </View>
@@ -241,7 +241,7 @@ export default function MapScreen() {
                     Opening Hours: {location.hours}
                   </Text>
                   <TouchableOpacity
-                    className="mt-2 bg-blue-500 p-2 rounded-md"
+                    className="mt-2 bg-customBlue p-2 rounded-md"
                     onPress={() => openModal(location)}
                   >
                     <Text className="text-white text-center text-xs">
