@@ -18,7 +18,9 @@ import {
   polyclinics,
   privateHospitals,
   publicHospitals,
+  services, // Import services
 } from "@/constants/hospitalData";
+import { useRouter } from "expo-router"; // Import useRouter for navigation
 
 // Define the Location interface
 interface Location {
@@ -28,6 +30,7 @@ interface Location {
   address: string;
   hours: string;
   phone: string;
+  services?: string[]; // Add services as an optional field
 }
 
 export default function MapScreen() {
@@ -47,6 +50,7 @@ export default function MapScreen() {
   );
   const [modalVisible, setModalVisible] = useState(false);
   const mapRef = useRef<MapView>(null);
+  const router = useRouter(); // Initialize useRouter for navigation
 
   const zoomIn = () => {
     const newRegion = {
@@ -141,14 +145,26 @@ export default function MapScreen() {
     setFilteredLocations(allLocations);
   };
 
+  // Function to get random services from the array
+  const getRandomServices = (num: number) => {
+    const shuffled = [...services].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, num);
+  };
+
   const openModal = (location: Location) => {
-    setSelectedLocation(location);
+    const selectedServices = getRandomServices(3); // Get 3 random services
+    setSelectedLocation({ ...location, services: selectedServices });
     setModalVisible(true);
   };
 
   const closeModal = () => {
     setModalVisible(false);
     setSelectedLocation(null);
+  };
+
+  const handleBookAppointment = () => {
+    closeModal();
+    router.push("/booking"); // Navigate to the appointment page
   };
 
   return (
@@ -346,6 +362,29 @@ export default function MapScreen() {
                 <Text className="text-sm mb-2">
                   Phone: {selectedLocation.phone}
                 </Text>
+                <Text className="text-sm font-bold mt-4">
+                  Services Provided:
+                </Text>
+                {selectedLocation.services &&
+                  selectedLocation.services.map((service, index) => (
+                    <Text key={index} className="text-sm mb-1">
+                      • {service}
+                    </Text>
+                  ))}
+                <TouchableOpacity
+                  className="mt-4 bg-customBlue2 p-3 rounded-md flex-row items-center justify-center"
+                  onPress={handleBookAppointment}
+                >
+                  <Ionicons
+                    name="calendar-outline"
+                    size={20}
+                    color="white"
+                    className="mr-2"
+                  />
+                  <Text className="text-white text-center text-sm">
+                    Book Appointment
+                  </Text>
+                </TouchableOpacity>
               </View>
             </View>
           </Modal>

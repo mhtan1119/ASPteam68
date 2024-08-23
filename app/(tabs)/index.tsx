@@ -1,14 +1,29 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
+import { View, Text, TouchableOpacity } from "react-native";
+import {
+  useFocusEffect,
+  useNavigation,
+  NavigationProp,
+} from "@react-navigation/native";
 import { SQLiteProvider, useSQLiteContext } from "expo-sqlite";
+import { styled } from "nativewind";
+
+type RootStackParamList = {
+  booking: undefined; // Add more routes as needed
+};
+
+const StyledView = styled(View);
+const StyledText = styled(Text);
+const StyledTouchableOpacity = styled(TouchableOpacity);
 
 const UserListScreen: React.FC = () => {
   const db = useSQLiteContext();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [nextAppointment, setNextAppointment] = useState<{
     date: string;
     time: string;
   } | null>(null);
+  const [isVisible, setIsVisible] = useState(true);
 
   const fetchAppointments = async () => {
     try {
@@ -22,7 +37,6 @@ const UserListScreen: React.FC = () => {
         })
       );
 
-      // Set the earliest appointment as the next appointment
       if (appointmentList.length > 0) {
         setNextAppointment(appointmentList[0]);
       }
@@ -37,17 +51,35 @@ const UserListScreen: React.FC = () => {
     }, [])
   );
 
+  const handleClose = () => {
+    setIsVisible(false);
+  };
+
+  const handleNavigate = () => {
+    navigation.navigate("booking"); // Make sure the route name matches your navigator's route configuration
+  };
+
   return (
-    <View style={styles.container}>
-      {nextAppointment && (
-        <View style={styles.banner}>
-          <Text style={styles.bannerText}>
-            Your next appointment is on: {nextAppointment.date} at{" "}
-            {nextAppointment.time}
-          </Text>
-        </View>
+    <StyledView className="flex-1 items-center justify-center bg-white p-4">
+      {isVisible && nextAppointment && (
+        <StyledView className="absolute top-5 left-0 right-0 bg-customBeige p-4 rounded-b-lg items-center flex-row justify-between shadow-lg z-10">
+          {/* Warning Icon */}
+          <StyledText className="text-red-600 text-xl mr-2">⚠️</StyledText>
+          <StyledText className="text-gray-800 text-sm font-bold flex-1 mr-2">
+            Your{" "}
+            <StyledTouchableOpacity onPress={handleNavigate}>
+              <StyledText className="underline text-red-600">
+                next appointment
+              </StyledText>
+            </StyledTouchableOpacity>{" "}
+            is on: {nextAppointment.date} at {nextAppointment.time}
+          </StyledText>
+          <StyledTouchableOpacity onPress={handleClose} className="p-1">
+            <StyledText className="text-gray-800 text-sm">✖</StyledText>
+          </StyledTouchableOpacity>
+        </StyledView>
       )}
-    </View>
+    </StyledView>
   );
 };
 
@@ -58,27 +90,5 @@ const App: React.FC = () => {
     </SQLiteProvider>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#fff",
-    padding: 16,
-  },
-  banner: {
-    backgroundColor: "#ffcc00",
-    padding: 10,
-    borderRadius: 5,
-    width: "100%",
-    alignItems: "center",
-  },
-  bannerText: {
-    color: "#333",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-});
 
 export default App;
