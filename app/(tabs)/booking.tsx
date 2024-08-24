@@ -23,7 +23,8 @@ import {
   publicHospitals,
   services,
 } from "@/constants/hospitalData";
-
+import { useRouter, useLocalSearchParams } from "expo-router";
+import { useEffect } from "react";
 const StyledSafeAreaView = styled(SafeAreaView);
 const StyledScrollView = styled(ScrollView);
 const StyledText = styled(Text);
@@ -60,6 +61,8 @@ export default function App() {
 
 function Booking() {
   const db = useSQLiteContext();
+  const router = useRouter();
+  const { locationName } = useLocalSearchParams(); // Retrieve the passed location name
 
   // Extract healthcare facility names dynamically from the imported data
   const healthcareFacilityNames = allLocations.map((location) => location.name);
@@ -75,7 +78,8 @@ function Booking() {
   timeOptions.push("18:00");
 
   const [service, setService] = useState("");
-  const [location, setLocation] = useState("");
+  const [location, setLocation] = useState(""); // Initialize location state as empty string
+
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [time, setTime] = useState("");
@@ -91,6 +95,12 @@ function Booking() {
   const [tempService, setTempService] = useState(service);
   const [tempLocation, setTempLocation] = useState(location);
   const [tempTime, setTempTime] = useState(time);
+
+  useEffect(() => {
+    if (typeof locationName === "string") {
+      setLocation(locationName); // Set location state with the passed location name if it's a string
+    }
+  }, [locationName]);
 
   const radio_props = [
     { label: "Yes", value: 1 },

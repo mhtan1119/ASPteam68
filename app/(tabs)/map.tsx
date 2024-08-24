@@ -162,9 +162,12 @@ export default function MapScreen() {
     setSelectedLocation(null);
   };
 
-  const handleBookAppointment = () => {
+  const handleBookAppointment = (locationName: string) => {
     closeModal();
-    router.push("/booking"); // Navigate to the appointment page
+    router.push({
+      pathname: "/booking",
+      params: { locationName },
+    });
   };
 
   return (
@@ -373,7 +376,7 @@ export default function MapScreen() {
                   ))}
                 <TouchableOpacity
                   className="mt-4 bg-customBlue2 p-3 rounded-md flex-row items-center justify-center"
-                  onPress={handleBookAppointment}
+                  onPress={() => handleBookAppointment(selectedLocation?.name)}
                 >
                   <Ionicons
                     name="calendar-outline"
