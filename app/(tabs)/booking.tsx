@@ -72,6 +72,7 @@ function Booking() {
     date: passedDate,
     time: passedTime,
     remarks: passedRemarks,
+    clearForm, // Add this to retrieve the clearForm parameter
   } = useLocalSearchParams(); // Retrieve passed service, location, date, time, and remarks
 
   // Extract healthcare facility names dynamically from the imported data
@@ -119,6 +120,19 @@ function Booking() {
     if (passedTime) setTime(passedTime);
     if (passedRemarks) setRemarks(passedRemarks);
   }, [passedService, locationName, passedDate, passedTime, passedRemarks]);
+
+  useEffect(() => {
+    if (clearForm) {
+      setService("");
+      setDate(new Date()); // Reset date to the current date
+      setTime("");
+      setRemarks("");
+      setSymptoms(0);
+      setAllergy(0);
+      setAllergyDetails("");
+    }
+    if (locationName) setLocation(locationName);
+  }, [clearForm, locationName]);
 
   const radio_props = [
     { label: "Yes", value: 1 },

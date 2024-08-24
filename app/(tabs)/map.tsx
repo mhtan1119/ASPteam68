@@ -166,7 +166,10 @@ export default function MapScreen() {
     closeModal();
     router.push({
       pathname: "/booking",
-      params: { locationName },
+      params: {
+        locationName,
+        clearForm: "true", // Add this parameter to signal clearing the form
+      },
     });
   };
 
