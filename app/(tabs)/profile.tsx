@@ -14,6 +14,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { RadioButton } from 'react-native-paper';
 import DateTimePicker, { Event } from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
+import * as ImagePicker from 'expo-image-picker';
 
 const ProfileEditPage: React.FC = () => {
   const [editing, setEditing] = useState(false);
@@ -27,6 +28,7 @@ const ProfileEditPage: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [address, setAddress] = useState("");
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
 
   const handleDateChange = (event: Event, selectedDate?: Date) => {
     const currentDate = selectedDate || dateOfBirth;
@@ -40,13 +42,27 @@ const ProfileEditPage: React.FC = () => {
     setEditing(false); // Switch back to profile view
   };
 
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      const imageUri = result.assets[0]?.uri;
+      setProfileImage(imageUri);
+    }
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {!editing ? (
         <View style={styles.profileContainer}>
           <View style={styles.headerContainer}>
             <Image
-              source={{ uri: 'https://via.placeholder.com/150' }}
+              source={{ uri: profileImage || 'https://via.placeholder.com/150' }}
               style={styles.profileImage}
             />
             <View style={styles.greetingContainer}>
@@ -76,10 +92,12 @@ const ProfileEditPage: React.FC = () => {
         <View style={styles.editView}>
           <Text style={styles.title}>Edit Profile</Text>
           <View style={styles.profilePicContainer}>
-            <Image
-              source={{ uri: 'https://via.placeholder.com/150' }}
-              style={styles.profileImageLarge}
-            />
+            <TouchableOpacity onPress={pickImage}>
+              <Image
+                source={{ uri: profileImage || 'https://via.placeholder.com/150' }}
+                style={styles.profileImageLarge}
+              />
+            </TouchableOpacity>
           </View>
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Full Name</Text>
@@ -219,8 +237,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   profileContainer: {
-    flexDirection: 'column',
-    alignItems: 'flex-start',
     marginBottom: 20,
   },
   headerContainer: {
@@ -229,107 +245,98 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     marginTop: 40, // Add margin top to move the content down
   },
-  profilePicContainer: {
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  settingsContainer: {
-    width: '100%',
-    paddingLeft: 16,
-  },
   profileImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    marginRight: 16,
-  },
-  profileImageLarge: {
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: '#ccc',
+    borderWidth: 2,
+    borderColor: '#3F5F90',
   },
   greetingContainer: {
+    marginLeft: 20,
+    flexDirection: 'column',
     alignItems: 'flex-start',
-    position: 'relative',
   },
   greetingText: {
     fontSize: 24,
     fontWeight: 'bold',
   },
+  editButton: {
+    backgroundColor: '#3F5F90',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  settingsContainer: {
+    marginTop: 20,
+  },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
-    marginVertical: 10,
+    marginBottom: 10,
   },
   link: {
     fontSize: 16,
     color: '#808080',
-    marginVertical: 8,
+    marginBottom: 10,
   },
   editView: {
     flex: 1,
-    paddingHorizontal: 16,
+    padding: 16,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
+    textAlign: 'center',
+  },
+  profilePicContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  profileImageLarge: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 2,
+    borderColor: '#3F5F90',
   },
   inputContainer: {
-    marginBottom: 15,
+    marginBottom: 20,
   },
   label: {
     fontSize: 16,
     fontWeight: 'bold',
-    marginBottom: 5,
+    marginBottom: 8,
   },
   input: {
+    borderColor: '#ddd',
     borderWidth: 1,
-    borderColor: '#ccc',
     borderRadius: 5,
     padding: 10,
     fontSize: 16,
   },
   textArea: {
+    borderColor: '#ddd',
     borderWidth: 1,
-    borderColor: '#ccc',
     borderRadius: 5,
     padding: 10,
     fontSize: 16,
+    height: 80,
     textAlignVertical: 'top',
-  },
-  rowContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 15,
-  },
-  columnContainer: {
-    width: '48%',
-  },
-  columnSpacing: {
-    marginLeft: '4%',
-  },
-  radioContainer: {
-    flexDirection: 'row',
-  },
-  radioButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: 20,
-  },
-  radioText: {
-    fontSize: 16,
   },
   dateInput: {
     flexDirection: 'row',
     alignItems: 'center',
+    borderColor: '#ddd',
     borderWidth: 1,
-    borderColor: '#ccc',
     borderRadius: 5,
     padding: 10,
     fontSize: 16,
-    marginBottom: 15,
   },
   calendarIcon: {
     marginRight: 10,
@@ -337,38 +344,49 @@ const styles = StyleSheet.create({
   dateText: {
     fontSize: 16,
   },
+  rowContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  columnContainer: {
+    flex: 1,
+  },
+  columnSpacing: {
+    marginLeft: 10,
+  },
   pickerContainer: {
+    borderColor: '#ddd',
     borderWidth: 1,
-    borderColor: '#ccc',
     borderRadius: 5,
-    marginTop: 5,
+    overflow: 'hidden',
   },
   picker: {
-    height: 50,
+    height: 40,
     width: '100%',
+  },
+  radioContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  radioButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  radioText: {
+    fontSize: 16,
+    marginLeft: 8,
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 20,
   },
   button: {
     backgroundColor: '#3F5F90',
     padding: 10,
     borderRadius: 5,
-    width: '48%',
+    flex: 1,
     alignItems: 'center',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-  },
-  editButton: {
-    backgroundColor: "#3F5F90",
-    borderRadius: 5,
-    paddingVertical: 8,
-    paddingHorizontal: 12, // Adjusted padding
-    alignSelf: 'center',  // Centers the button horizontally
+    marginHorizontal: 5,
   },
 });
 
