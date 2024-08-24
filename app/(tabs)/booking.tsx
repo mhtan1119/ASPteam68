@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -24,7 +24,7 @@ import {
   services,
 } from "@/constants/hospitalData";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { useEffect } from "react";
+
 const StyledSafeAreaView = styled(SafeAreaView);
 const StyledScrollView = styled(ScrollView);
 const StyledText = styled(Text);
@@ -62,7 +62,11 @@ export default function App() {
 function Booking() {
   const db = useSQLiteContext();
   const router = useRouter();
-  const { locationName } = useLocalSearchParams(); // Retrieve the passed location name
+  const {
+    locationName,
+    date: passedDate,
+    time: passedTime,
+  } = useLocalSearchParams(); // Retrieve passed date and time
 
   // Extract healthcare facility names dynamically from the imported data
   const healthcareFacilityNames = allLocations.map((location) => location.name);
@@ -79,7 +83,6 @@ function Booking() {
 
   const [service, setService] = useState("");
   const [location, setLocation] = useState(""); // Initialize location state as empty string
-
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [time, setTime] = useState("");
@@ -100,7 +103,15 @@ function Booking() {
     if (typeof locationName === "string") {
       setLocation(locationName); // Set location state with the passed location name if it's a string
     }
-  }, [locationName]);
+
+    if (typeof passedDate === "string") {
+      setDate(new Date(passedDate)); // Set date state with the passed date
+    }
+
+    if (typeof passedTime === "string") {
+      setTime(passedTime); // Set time state with the passed time
+    }
+  }, [locationName, passedDate, passedTime]);
 
   const radio_props = [
     { label: "Yes", value: 1 },

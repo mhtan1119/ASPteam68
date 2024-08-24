@@ -7,6 +7,7 @@ import {
 } from "@react-navigation/native";
 import { SQLiteProvider, useSQLiteContext } from "expo-sqlite";
 import { styled } from "nativewind";
+import { router } from "expo-router";
 
 type RootStackParamList = {
   booking: undefined; // Add more routes as needed
@@ -56,7 +57,15 @@ const UserListScreen: React.FC = () => {
   };
 
   const handleNavigate = () => {
-    navigation.navigate("booking"); // Make sure the route name matches your navigator's route configuration
+    if (nextAppointment) {
+      router.push({
+        pathname: "/booking",
+        params: {
+          date: nextAppointment.date,
+          time: nextAppointment.time,
+        },
+      });
+    }
   };
 
   return (
