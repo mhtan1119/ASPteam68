@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -28,7 +28,7 @@ import {
   services,
 } from "@/constants/hospitalData";
 import { useRouter, useLocalSearchParams } from "expo-router";
-
+import { useFocusEffect } from "@react-navigation/native";
 const StyledSafeAreaView = styled(SafeAreaView);
 const StyledScrollView = styled(ScrollView);
 const StyledText = styled(Text);
@@ -145,7 +145,23 @@ function Booking() {
     setService(tempService);
     setServiceModalVisible(false);
   };
-
+  // Inside the Booking component
+  useFocusEffect(
+    useCallback(() => {
+      // Logic to fetch or update data here, if needed
+      if (locationName) setLocation(locationName); // Update the location with the latest value
+      if (passedService) setService(passedService);
+      if (passedLocation) setLocation(passedLocation);
+      if (passedDate) {
+        const dateValue = Array.isArray(passedDate)
+          ? passedDate[0]
+          : passedDate;
+        setDate(new Date(dateValue));
+      }
+      if (passedTime) setTime(passedTime);
+      if (passedRemarks) setRemarks(passedRemarks);
+    }, [locationName, passedService, passedDate, passedTime, passedRemarks])
+  );
   const handleLocationSelect = () => {
     setLocation(tempLocation);
     setLocationModalVisible(false);

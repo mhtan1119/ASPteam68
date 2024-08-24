@@ -60,7 +60,8 @@ const UserListScreen: React.FC = () => {
     setIsVisible(false);
   };
 
-  const handleNavigate = () => {
+  const handleNavigate = async () => {
+    await fetchAppointments(); // Ensure data is fresh before navigating
     if (nextAppointment) {
       router.push({
         pathname: "/booking",
