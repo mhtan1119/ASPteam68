@@ -67,6 +67,7 @@ function Booking() {
   const db = useSQLiteContext();
   const router = useRouter();
   const {
+    location: passedLocation,
     service: passedService,
     locationName,
     date: passedDate,
@@ -111,8 +112,9 @@ function Booking() {
   const [tempTime, setTempTime] = useState(time);
 
   useEffect(() => {
+    if (locationName) setLocation(locationName); // Prefill the location from the database
     if (passedService) setService(passedService);
-    if (locationName) setLocation(locationName);
+    if (passedLocation) setLocation(passedLocation);
     if (passedDate) {
       const dateValue = Array.isArray(passedDate) ? passedDate[0] : passedDate;
       setDate(new Date(dateValue));
