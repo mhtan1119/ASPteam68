@@ -14,7 +14,11 @@ import { Picker } from "@react-native-picker/picker";
 import RadioForm from "react-native-simple-radio-button";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { styled } from "nativewind";
-import { SQLiteProvider, useSQLiteContext } from "expo-sqlite";
+import {
+  SQLiteBindParams,
+  SQLiteProvider,
+  useSQLiteContext,
+} from "expo-sqlite";
 import {
   HospitalLocation,
   allLocations,
@@ -63,10 +67,12 @@ function Booking() {
   const db = useSQLiteContext();
   const router = useRouter();
   const {
+    service: passedService,
     locationName,
     date: passedDate,
     time: passedTime,
-  } = useLocalSearchParams(); // Retrieve passed date and time
+    remarks: passedRemarks,
+  } = useLocalSearchParams(); // Retrieve passed service, location, date, time, and remarks
 
   // Extract healthcare facility names dynamically from the imported data
   const healthcareFacilityNames = allLocations.map((location) => location.name);
@@ -81,12 +87,16 @@ function Booking() {
   }
   timeOptions.push("18:00");
 
-  const [service, setService] = useState("");
-  const [location, setLocation] = useState(""); // Initialize location state as empty string
-  const [date, setDate] = useState(new Date());
+  const [service, setService] = useState(passedService || "");
+  const [location, setLocation] = useState(locationName || "");
+  const [date, setDate] = useState(
+    passedDate
+      ? new Date(Array.isArray(passedDate) ? passedDate[0] : passedDate)
+      : new Date()
+  );
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [time, setTime] = useState("");
-  const [remarks, setRemarks] = useState("");
+  const [time, setTime] = useState(passedTime || "");
+  const [remarks, setRemarks] = useState(passedRemarks || "");
   const [symptoms, setSymptoms] = useState(0);
   const [allergy, setAllergy] = useState(0);
   const [allergyDetails, setAllergyDetails] = useState("");
@@ -100,18 +110,15 @@ function Booking() {
   const [tempTime, setTempTime] = useState(time);
 
   useEffect(() => {
-    if (typeof locationName === "string") {
-      setLocation(locationName); // Set location state with the passed location name if it's a string
+    if (passedService) setService(passedService);
+    if (locationName) setLocation(locationName);
+    if (passedDate) {
+      const dateValue = Array.isArray(passedDate) ? passedDate[0] : passedDate;
+      setDate(new Date(dateValue));
     }
-
-    if (typeof passedDate === "string") {
-      setDate(new Date(passedDate)); // Set date state with the passed date
-    }
-
-    if (typeof passedTime === "string") {
-      setTime(passedTime); // Set time state with the passed time
-    }
-  }, [locationName, passedDate, passedTime]);
+    if (passedTime) setTime(passedTime);
+    if (passedRemarks) setRemarks(passedRemarks);
+  }, [passedService, locationName, passedDate, passedTime, passedRemarks]);
 
   const radio_props = [
     { label: "Yes", value: 1 },
@@ -150,7 +157,7 @@ function Booking() {
     try {
       await db.runAsync(
         "INSERT INTO appointments (service, location, date, time, remarks) VALUES (?, ?, ?, ?, ?);",
-        [service, location, formattedDate, time, remarks]
+        [service, location, formattedDate, time, remarks] as SQLiteBindParams
       );
       Alert.alert("Success", "Appointment saved successfully.");
     } catch (error) {
@@ -306,7 +313,7 @@ function Booking() {
         <StyledTextInput
           placeholder="Remarks"
           className="h-10 border border-gray-300 rounded px-2 mb-4 bg-white"
-          value={remarks}
+          value={remarks.toString()}
           onChangeText={(text) => setRemarks(text)}
         />
 

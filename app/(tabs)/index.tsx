@@ -21,6 +21,9 @@ const UserListScreen: React.FC = () => {
   const db = useSQLiteContext();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [nextAppointment, setNextAppointment] = useState<{
+    service: string | number | (string | number)[] | null | undefined;
+    location: string | number | (string | number)[] | null | undefined;
+    remarks: string | number | (string | number)[] | null | undefined;
     date: string;
     time: string;
   } | null>(null);
@@ -29,14 +32,15 @@ const UserListScreen: React.FC = () => {
   const fetchAppointments = async () => {
     try {
       const result = await db.getAllAsync(
-        "SELECT date, time FROM appointments ORDER BY date ASC, time ASC LIMIT 1;"
+        "SELECT service, location, date, time, remarks FROM appointments ORDER BY date ASC, time ASC LIMIT 1;"
       );
-      const appointmentList = (result as { date: string; time: string }[]).map(
-        (row) => ({
-          date: row.date,
-          time: row.time,
-        })
-      );
+      const appointmentList = result.map((row: any) => ({
+        service: row.service,
+        location: row.location,
+        date: row.date,
+        time: row.time,
+        remarks: row.remarks,
+      }));
 
       if (appointmentList.length > 0) {
         setNextAppointment(appointmentList[0]);
@@ -61,13 +65,15 @@ const UserListScreen: React.FC = () => {
       router.push({
         pathname: "/booking",
         params: {
+          service: nextAppointment.service,
+          location: nextAppointment.location,
           date: nextAppointment.date,
           time: nextAppointment.time,
+          remarks: nextAppointment.remarks,
         },
       });
     }
   };
-
   return (
     <StyledView className="flex-1 items-center justify-center bg-white p-4">
       {isVisible && nextAppointment && (
