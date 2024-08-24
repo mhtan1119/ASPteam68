@@ -109,6 +109,19 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="login"
+        options={{
+          title: "Login",
+          tabBarIcon: ({ color }) => (
+            <Ionicons
+              name="log-in-outline"
+              color={color} // Use the color prop for consistency with the tint colors
+              size={24}
+            />
+          ),
+        }}
+      />
     </Tabs>
   );
 }
