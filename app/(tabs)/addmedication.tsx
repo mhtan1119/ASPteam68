@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
-  Modal,
+  Platform,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -23,8 +23,10 @@ const AddMedication = () => {
 
   const onTimeChange = (event: any, selectedTime: Date | undefined) => {
     const currentTime = selectedTime || time;
-    setShowTimePicker(false);
     setTime(currentTime);
+    if (Platform.OS !== 'ios') {
+      setShowTimePicker(false); // Close the picker after selection for non-iOS
+    }
   };
 
   const formatTime = (time: Date) => {
@@ -34,6 +36,10 @@ const AddMedication = () => {
     const formattedHours = hours % 12 || 12;
     const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
     return `${formattedHours}:${formattedMinutes} ${ampm}`;
+  };
+
+  const confirmTime = () => {
+    setShowTimePicker(false); // Close the picker when user confirms
   };
 
   return (
@@ -64,31 +70,21 @@ const AddMedication = () => {
           <Text style={styles.buttonText}>{unit}</Text>
         </TouchableOpacity>
 
-        <Modal visible={showUnitPicker} animationType="slide" transparent={true}>
-          <View style={styles.modalContainer}>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={unit}
-                onValueChange={(itemValue) => {
-                  setUnit(itemValue);
-                  setShowUnitPicker(false);
-                }}
-              >
-                <Picker.Item label="mg" value="mg" />
-                <Picker.Item label="mcg" value="mcg" />
-                <Picker.Item label="g" value="g" />
-                <Picker.Item label="ml" value="ml" />
-                <Picker.Item label="%" value="%" />
-              </Picker>
-              <TouchableOpacity
-                style={styles.closeButton}
-                onPress={() => setShowUnitPicker(false)}
-              >
-                <Text style={styles.closeButtonText}>Close</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
+        {showUnitPicker && (
+          <Picker
+            selectedValue={unit}
+            onValueChange={(itemValue) => {
+              setUnit(itemValue);
+              setShowUnitPicker(false);
+            }}
+          >
+            <Picker.Item label="mg" value="mg" />
+            <Picker.Item label="mcg" value="mcg" />
+            <Picker.Item label="g" value="g" />
+            <Picker.Item label="ml" value="ml" />
+            <Picker.Item label="%" value="%" />
+          </Picker>
+        )}
 
         <Text style={styles.label}>Dosage Form</Text>
         <TouchableOpacity
@@ -100,30 +96,20 @@ const AddMedication = () => {
           </Text>
         </TouchableOpacity>
 
-        <Modal visible={showFormPicker} animationType="slide" transparent={true}>
-          <View style={styles.modalContainer}>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={dosageForm}
-                onValueChange={(itemValue) => {
-                  setDosageForm(itemValue);
-                  setShowFormPicker(false);
-                }}
-              >
-                <Picker.Item label="Capsule" value="capsule" />
-                <Picker.Item label="Tablet" value="tablet" />
-                <Picker.Item label="Liquid" value="liquid" />
-                <Picker.Item label="Topical" value="topical" />
-              </Picker>
-              <TouchableOpacity
-                style={styles.closeButton}
-                onPress={() => setShowFormPicker(false)}
-              >
-                <Text style={styles.closeButtonText}>Close</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
+        {showFormPicker && (
+          <Picker
+            selectedValue={dosageForm}
+            onValueChange={(itemValue) => {
+              setDosageForm(itemValue);
+              setShowFormPicker(false);
+            }}
+          >
+            <Picker.Item label="Capsule" value="capsule" />
+            <Picker.Item label="Tablet" value="tablet" />
+            <Picker.Item label="Liquid" value="liquid" />
+            <Picker.Item label="Topical" value="topical" />
+          </Picker>
+        )}
 
         <Text style={styles.label}>Time to be Taken</Text>
         <TouchableOpacity
@@ -137,10 +123,18 @@ const AddMedication = () => {
           <DateTimePicker
             value={time}
             mode="time"
-            display="default"
+            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
             onChange={onTimeChange}
-            style={styles.dateTimePicker}
           />
+        )}
+
+        {Platform.OS === 'ios' && showTimePicker && (
+          <TouchableOpacity
+            style={styles.confirmButton}
+            onPress={confirmTime}
+          >
+            <Text style={styles.buttonText}>Confirm</Text>
+          </TouchableOpacity>
         )}
 
         <TouchableOpacity style={styles.saveButton}>
@@ -188,6 +182,14 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
   },
+  confirmButton: {
+    height: 40,
+    backgroundColor: '#83B4FF',
+    borderRadius: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
   saveButton: {
     backgroundColor: '#83B4FF',
     paddingVertical: 12,
@@ -204,32 +206,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  pickerContainer: {
-    backgroundColor: '#FFFFFF',
-    width: '80%',
-    borderRadius: 8,
-    padding: 16,
-  },
-  closeButton: {
-    backgroundColor: '#FF6347',
-    padding: 10,
-    borderRadius: 5,
-    marginTop: 16,
-    alignItems: 'center',
-  },
-  closeButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-  },
-  dateTimePicker: {
-    width: '100%',
-    backgroundColor: 'transparent',
   },
 });
