@@ -79,7 +79,7 @@ const MedTracking = () => {
             <StyledTouchableOpacity
               key={index}
               className={`w-10 h-10 rounded-full items-center justify-center ${
-                index === selectedDayIndex ? "bg-[#83B4FF]" : "bg-black"
+                index === selectedDayIndex ? "bg-customBlue" : "bg-black"
               }`}
               onPress={() => handleDayPress(index)}
             >
@@ -91,7 +91,7 @@ const MedTracking = () => {
         {/* Add Medication Button */}
         {!showAddMedication && (
           <StyledTouchableOpacity
-            className="bg-[#83B4FF] py-3 px-6 rounded-lg mt-4 shadow-md"
+            className="bg-customBlue py-3 px-6 rounded-lg mt-4 shadow-md"
             onPress={() => setShowAddMedication(true)}
           >
             <StyledText className="text-white text-lg font-bold text-center">
@@ -113,7 +113,7 @@ const MedTracking = () => {
               8:30
             </StyledText>
             <StyledView className="mt-2 w-full">
-              <StyledTouchableOpacity className="bg-[#83B4FF] py-3 px-4 rounded-lg mt-2 w-full flex-row items-center shadow-md">
+              <StyledTouchableOpacity className="bg-customBlue py-3 px-4 rounded-lg mt-2 w-full flex-row items-center shadow-md">
                 <StyledTouchableOpacity
                   className="w-7 h-7 rounded-md border border-black items-center justify-center mr-4"
                   onPress={() =>
@@ -136,7 +136,7 @@ const MedTracking = () => {
                 </StyledText>
               </StyledTouchableOpacity>
 
-              <StyledTouchableOpacity className="bg-[#83B4FF] py-3 px-4 rounded-lg mt-2 w-full flex-row items-center shadow-md">
+              <StyledTouchableOpacity className="bg-customBlue py-3 px-4 rounded-lg mt-2 w-full flex-row items-center shadow-md">
                 <StyledTouchableOpacity
                   className="w-7 h-7 rounded-md border border-black items-center justify-center mr-4"
                   onPress={() =>
@@ -222,7 +222,7 @@ const AddMedication = ({ onClose }: { onClose: () => void }) => {
 
       <StyledText className="text-lg font-bold mb-2">Choose Unit</StyledText>
       <StyledTouchableOpacity
-        className="h-10 bg-[#83B4FF] rounded justify-center items-center mb-4"
+        className="h-10 bg-customBlue rounded justify-center items-center mb-4"
         onPress={() => setShowUnitPicker(true)}
       >
         <StyledText className="text-white text-lg">{unit}</StyledText>
@@ -246,7 +246,7 @@ const AddMedication = ({ onClose }: { onClose: () => void }) => {
 
       <StyledText className="text-lg font-bold mb-2">Dosage Form</StyledText>
       <StyledTouchableOpacity
-        className="h-10 bg-[#83B4FF] rounded justify-center items-center mb-4"
+        className="h-10 bg-customBlue rounded justify-center items-center mb-4"
         onPress={() => setShowFormPicker(true)}
       >
         <StyledText className="text-white text-lg">
@@ -273,7 +273,7 @@ const AddMedication = ({ onClose }: { onClose: () => void }) => {
         Time to be Taken
       </StyledText>
       <StyledTouchableOpacity
-        className="h-10 bg-[#83B4FF] rounded justify-center items-center mb-4"
+        className="h-10 bg-customBlue rounded justify-center items-center mb-4"
         onPress={() => setShowTimePicker(true)}
       >
         <StyledText className="text-white text-lg">
@@ -292,7 +292,7 @@ const AddMedication = ({ onClose }: { onClose: () => void }) => {
 
       {Platform.OS === "ios" && showTimePicker && (
         <StyledTouchableOpacity
-          className="h-10 bg-[#83B4FF] rounded justify-center items-center mb-4"
+          className="h-10 bg-customBlue rounded justify-center items-center mb-4"
           onPress={confirmTime}
         >
           <StyledText className="text-white text-lg">Confirm</StyledText>
@@ -300,7 +300,7 @@ const AddMedication = ({ onClose }: { onClose: () => void }) => {
       )}
 
       <StyledTouchableOpacity
-        className="bg-[#83B4FF] py-3 rounded-lg mt-4 shadow-md"
+        className="bg-customBlue py-3 rounded-lg mt-4 shadow-md"
         onPress={() => {
           // Handle saving the medication
           onClose(); // Close the form

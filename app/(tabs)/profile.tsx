@@ -12,13 +12,21 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { RadioButton } from "react-native-paper";
-import DateTimePicker, { Event } from "@react-native-community/datetimepicker";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { Picker } from "@react-native-picker/picker";
 import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ProfileEditPage: React.FC = () => {
   const [editing, setEditing] = useState(false);
+
+  // Displayed profile state
+  const [displayFullName, setDisplayFullName] = useState("");
+  const [displayProfileImage, setDisplayProfileImage] = useState<string | null>(
+    null
+  );
+
+  // Editable profile state
   const [fullName, setFullName] = useState("");
   const [gender, setGender] = useState("male");
   const [dateOfBirth, setDateOfBirth] = useState(new Date());
@@ -47,6 +55,10 @@ const ProfileEditPage: React.FC = () => {
           setPhoneNumber(data.phoneNumber || "");
           setAddress(data.address || "");
           setProfileImage(data.profileImage || null);
+
+          // Update the displayed state as well
+          setDisplayFullName(data.fullName || "");
+          setDisplayProfileImage(data.profileImage || null);
         }
       } catch (error) {
         console.error("Error loading profile data", error);
@@ -79,7 +91,11 @@ const ProfileEditPage: React.FC = () => {
 
       await AsyncStorage.setItem("userProfile", JSON.stringify(profileData));
       Alert.alert("Profile Updated", "Your profile has been updated.");
-      setEditing(false); // Switch back to profile view
+      setEditing(false);
+
+      // Update the displayed state after saving
+      setDisplayFullName(fullName);
+      setDisplayProfileImage(profileImage);
     } catch (error) {
       console.error("Error saving profile data", error);
     }
@@ -106,12 +122,12 @@ const ProfileEditPage: React.FC = () => {
           <View style={styles.headerContainer}>
             <Image
               source={{
-                uri: profileImage || "https://via.placeholder.com/150",
+                uri: displayProfileImage || "https://via.placeholder.com/150",
               }}
               style={styles.profileImage}
             />
             <View style={styles.greetingContainer}>
-              <Text style={styles.greetingText}>Hi, {fullName}!</Text>
+              <Text style={styles.greetingText}>Hi, {displayFullName}!</Text>
               <Pressable
                 style={styles.editButton}
                 onPress={() => setEditing(true)}

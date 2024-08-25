@@ -129,7 +129,7 @@ const UserListScreen: React.FC = () => {
       <StatusBar style="dark" />
       <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 10 }}>
         {isVisible && nextAppointment && (
-          <StyledView className="absolute top-0 left-0 right-0 bg-[#FDFFE2] p-4 rounded-b-xl flex-row items-center z-60">
+          <StyledView className="absolute top-0 left-0 right-0 bg-customBeige p-4 rounded-b-xl flex-row items-center z-60">
             <StyledText className="text-red-600 text-xl mr-2">⚠️</StyledText>
             <StyledText className="text-gray-800 text-sm font-bold flex-1 mr-2">
               Your{" "}

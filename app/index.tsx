@@ -170,7 +170,7 @@ const LoginScreen: React.FC<{
         </TouchableOpacity>
       </View>
       <Pressable
-        className="w-4/5 p-3 bg-[#3F5F90] rounded mt-3 items-center"
+        className="w-4/5 p-3 bg-customBlue2 rounded mt-3 items-center"
         onPress={handleLogin}
       >
         <Text className="text-white text-lg font-bold">Login</Text>
@@ -307,7 +307,7 @@ const RegisterScreen: React.FC<{
         </View>
       </View>
       <Pressable
-        className="w-4/5 p-3 bg-[#3F5F90] rounded mt-3 items-center"
+        className="w-4/5 p-3 bg-customBlue2 rounded mt-3 items-center"
         onPress={handleRegister}
       >
         <Text className="text-white text-lg font-bold">Sign Up</Text>
@@ -335,7 +335,7 @@ const HomeScreen: React.FC<{
         Welcome, {user}
       </Text>
       <Pressable
-        className="w-4/5 p-3 bg-[#3F5F90] rounded mt-3 items-center"
+        className="w-4/5 p-3 bg-customBlue2 rounded mt-3 items-center"
         onPress={() => navigate("Login")}
       >
         <Text className="text-white text-lg font-bold">Logout</Text>
