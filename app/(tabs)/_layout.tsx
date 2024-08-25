@@ -19,19 +19,6 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="explore"
-        options={{
-          title: "Explore",
-          tabBarIcon: ({ color }) => (
-            <Ionicons
-              name="code-slash"
-              color={color} // Use the color prop for consistency with the tint colors
-              size={24}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
         name="index"
         options={{
           title: "Home",
@@ -90,32 +77,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <Ionicons
               name="person"
-              color={color} // Use the color prop for consistency with the tint colors
-              size={24}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="test"
-        options={{
-          title: "Test",
-          tabBarIcon: ({ color }) => (
-            <Ionicons
-              name="bug"
-              color={color} // Use the color prop for consistency with the tint colors
-              size={24}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="login"
-        options={{
-          title: "Login",
-          tabBarIcon: ({ color }) => (
-            <Ionicons
-              name="log-in-outline"
               color={color} // Use the color prop for consistency with the tint colors
               size={24}
             />
