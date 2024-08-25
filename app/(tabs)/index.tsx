@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Modal } from "react-native";
 import {
   useFocusEffect,
   useNavigation,
@@ -30,6 +30,7 @@ const UserListScreen: React.FC = () => {
     time: string;
   } | null>(null);
   const [isVisible, setIsVisible] = useState(true);
+  const [modalVisible, setModalVisible] = useState(false); // For showing the pop-up
 
   const fetchAppointments = async () => {
     try {
@@ -62,20 +63,12 @@ const UserListScreen: React.FC = () => {
     setIsVisible(false);
   };
 
-  const handleNavigate = async () => {
-    await fetchAppointments(); // Ensure data is fresh before navigating
-    if (nextAppointment) {
-      router.push({
-        pathname: "/booking",
-        params: {
-          service: nextAppointment.service,
-          location: nextAppointment.location,
-          date: nextAppointment.date,
-          time: nextAppointment.time,
-          remarks: nextAppointment.remarks,
-        },
-      });
-    }
+  const handleShowModal = () => {
+    setModalVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
   };
 
   return (
@@ -87,7 +80,7 @@ const UserListScreen: React.FC = () => {
           <StyledText className="text-red-600 text-xl mr-2">⚠️</StyledText>
           <StyledText className="text-gray-800 text-sm font-bold flex-1 mr-2">
             Your{" "}
-            <StyledTouchableOpacity onPress={handleNavigate}>
+            <StyledTouchableOpacity onPress={handleShowModal}>
               <StyledText className="underline text-red-600">
                 next appointment
               </StyledText>
@@ -99,6 +92,43 @@ const UserListScreen: React.FC = () => {
           </StyledTouchableOpacity>
         </StyledView>
       )}
+      {/* Modal for showing appointment details */}
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={handleCloseModal}
+      >
+        <StyledView className="flex-1 justify-center items-center bg-black bg-opacity-50">
+          <StyledView className="bg-white p-6 rounded-lg shadow-lg w-4/5">
+            <StyledText className="text-lg font-bold mb-4">
+              Appointment Details
+            </StyledText>
+            <StyledText className="mb-2">
+              Service: {nextAppointment?.service}
+            </StyledText>
+            <StyledText className="mb-2">
+              Location: {nextAppointment?.location}
+            </StyledText>
+            <StyledText className="mb-2">
+              Date: {nextAppointment?.date}
+            </StyledText>
+            <StyledText className="mb-2">
+              Time: {nextAppointment?.time}
+            </StyledText>
+            <StyledText className="mb-4">
+              Remarks: {nextAppointment?.remarks}
+            </StyledText>
+            <StyledTouchableOpacity
+              onPress={handleCloseModal}
+              className="bg-blue-500 py-2 rounded"
+            >
+              <StyledText className="text-white text-center">Close</StyledText>
+            </StyledTouchableOpacity>
+          </StyledView>
+        </StyledView>
+      </Modal>
+
       {/* Rest of the content */}
       <StyledView className="flex-row border-y-2 bg-customBlue mt-16">
         {/* Added mt-16 to adjust for the notification bar */}
