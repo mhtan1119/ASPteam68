@@ -361,7 +361,7 @@ function Booking() {
           onPress={(value) => setSymptoms(value)}
           formHorizontal={true}
           labelHorizontal={true}
-          buttonColor={"#2196f3"}
+          buttonColor={"#83B4FF"}
           animation={true}
         />
 
@@ -374,7 +374,7 @@ function Booking() {
           onPress={(value) => setAllergy(value)}
           formHorizontal={true}
           labelHorizontal={true}
-          buttonColor={"#2196f3"}
+          buttonColor={"#83B4FF"}
           animation={true}
         />
 

@@ -1,5 +1,12 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { View, Text, TouchableOpacity, Modal, StyleSheet, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Modal,
+  StyleSheet,
+  ScrollView,
+} from "react-native";
 import {
   useFocusEffect,
   useNavigation,
@@ -123,7 +130,9 @@ const UserListScreen: React.FC = () => {
                 onPress={handleCloseModal}
                 className="bg-blue-500 py-2 rounded"
               >
-                <StyledText className="text-white text-center">Close</StyledText>
+                <StyledText className="text-white text-center">
+                  Close
+                </StyledText>
               </StyledTouchableOpacity>
             </StyledView>
           </StyledView>
@@ -145,7 +154,9 @@ const UserListScreen: React.FC = () => {
           <Text className="text-sm">Weight: 65kg</Text>
         </StyledView>
         <StyledView className="border-t-2">
-          <Text className="ml-8 mt-8 text-2xl font-bold">Today's Medication</Text>
+          <Text className="ml-8 mt-8 text-2xl font-bold">
+            Today's Medication
+          </Text>
         </StyledView>
         <StyledView className="flex-row ml-16 my-8">
           <StyledView className="space-y-5">
@@ -200,16 +211,16 @@ const styles = StyleSheet.create({
     paddingBottom: 10, // Adjust the bottom padding to ensure content doesn't get cut off
   },
   notificationContainer: {
-    position: 'absolute',
+    position: "absolute",
     top: 0, // Adjust this value to move the notification down
     left: 0,
     right: 0,
-    backgroundColor: '#F8F4F4', // Replace with your custom color
+    backgroundColor: "#FDFFE2", // Replace with your custom color
     padding: 16,
     borderBottomLeftRadius: 8,
     borderBottomRightRadius: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     zIndex: 60, // Ensure the notification is above other content
   },
   contentContainer: {
