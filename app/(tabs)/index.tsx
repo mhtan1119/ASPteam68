@@ -14,7 +14,7 @@ import {
 } from "@react-navigation/native";
 import { SQLiteProvider, useSQLiteContext } from "expo-sqlite";
 import { styled } from "nativewind";
-import { router } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StatusBar } from "expo-status-bar";
 import Checkbox from "expo-checkbox";
 
@@ -39,6 +39,16 @@ const UserListScreen: React.FC = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [modalVisible, setModalVisible] = useState(false); // For showing the pop-up
 
+  const [userProfile, setUserProfile] = useState<{
+    age: number;
+    allergies: string;
+    bloodType: string;
+    height: string;
+    weight: string;
+  } | null>(null);
+
+  const [currentDateTime, setCurrentDateTime] = useState<string>("");
+
   const fetchAppointments = async () => {
     try {
       const result = await db.getAllAsync(
@@ -60,11 +70,54 @@ const UserListScreen: React.FC = () => {
     }
   };
 
+  const calculateAge = (dob: Date) => {
+    const today = new Date();
+    const birthDate = new Date(dob);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+    if (
+      monthDifference < 0 ||
+      (monthDifference === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+    return age;
+  };
+
+  const fetchUserProfile = async () => {
+    try {
+      const profileData = await AsyncStorage.getItem("userProfile");
+      if (profileData) {
+        const data = JSON.parse(profileData);
+        const age = calculateAge(new Date(data.dateOfBirth));
+        setUserProfile({
+          age,
+          allergies: data.allergies || "N/A",
+          bloodType: data.bloodType || "N/A",
+          height: data.height || "N/A",
+          weight: data.weight || "N/A",
+        });
+      }
+    } catch (error) {
+      console.log("Error fetching user profile:", error);
+    }
+  };
+
   useFocusEffect(
     useCallback(() => {
       fetchAppointments();
+      fetchUserProfile();
     }, [])
   );
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      const now = new Date();
+      setCurrentDateTime(now.toLocaleString());
+    }, 1000); // Update every second
+
+    return () => clearInterval(intervalId); // Clean up on unmount
+  }, []);
 
   const handleClose = () => {
     setIsVisible(false);
@@ -139,19 +192,19 @@ const UserListScreen: React.FC = () => {
         </Modal>
 
         {/* Rest of the content */}
-        <StyledView className="flex-row border-y-2 bg-customBlue mt-16">
+        <StyledView className="flex-row justify-between border-y-2 bg-customBlue mt-16">
           {/* Added mt-16 to adjust for the notification bar */}
-          <Text className="grow ml-4 my-4 text-3xl font-bold">
-            Health Summary
-          </Text>
-          <Text className="self-center mr-4">07/12/24 08:23 AM</Text>
+          <Text className="ml-4 my-4 text-3xl font-bold">Health Summary</Text>
+          <Text className="self-center mr-4">{currentDateTime}</Text>
         </StyledView>
         <StyledView className="ml-8 my-4 space-y-4">
-          <Text className="text-sm">Age: 30</Text>
-          <Text className="text-sm">Allergies & Reactions: N/A</Text>
-          <Text className="text-sm">Blood Type: AB+</Text>
-          <Text className="text-sm">Height: 170cm</Text>
-          <Text className="text-sm">Weight: 65kg</Text>
+          <Text className="text-sm">Age: {userProfile?.age}</Text>
+          <Text className="text-sm">
+            Allergies & Reactions: {userProfile?.allergies}
+          </Text>
+          <Text className="text-sm">Blood Type: {userProfile?.bloodType}</Text>
+          <Text className="text-sm">Height: {userProfile?.height} cm</Text>
+          <Text className="text-sm">Weight: {userProfile?.weight} kg</Text>
         </StyledView>
         <StyledView className="border-t-2">
           <Text className="ml-8 mt-8 text-2xl font-bold">
