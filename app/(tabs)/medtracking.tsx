@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import {
-  StyleSheet,
   View,
   SafeAreaView,
   TouchableOpacity,
@@ -11,6 +10,12 @@ import {
 import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import moment from "moment";
+import { styled } from "nativewind";
+
+const StyledView = styled(View);
+const StyledText = styled(Text);
+const StyledTouchableOpacity = styled(TouchableOpacity);
+const StyledTextInput = styled(TextInput);
 
 const MedTracking = () => {
   const daysOfWeek = [
@@ -58,42 +63,42 @@ const MedTracking = () => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
+    <SafeAreaView className="flex-1 bg-white">
+      <StyledView className="p-4 items-center">
         {/* Date Display */}
-        <Text style={styles.dateDisplay}>
+        <StyledText className="text-2xl text-black mb-4 text-center">
           {orderedDays[selectedDayIndex]},{" "}
           {moment()
             .add(selectedDayIndex - 2, "days")
             .format("D MMM")}
-        </Text>
+        </StyledText>
 
         {/* Day Circles */}
-        <View style={styles.dayCircles}>
+        <StyledView className="flex-row justify-between mb-4 w-full max-w-[300px]">
           {orderedDays.map((day, index) => (
-            <TouchableOpacity
+            <StyledTouchableOpacity
               key={index}
-              style={[
-                styles.dayCircle,
-                index === selectedDayIndex && styles.selectedDayCircle,
-              ]}
+              className={`w-10 h-10 rounded-full items-center justify-center ${
+                index === selectedDayIndex ? "bg-[#83B4FF]" : "bg-black"
+              }`}
               onPress={() => handleDayPress(index)}
             >
-              <Text style={styles.dayText}>{day.slice(0, 3)}</Text>
-            </TouchableOpacity>
+              <StyledText className="text-white">{day.slice(0, 3)}</StyledText>
+            </StyledTouchableOpacity>
           ))}
-        </View>
+        </StyledView>
 
         {/* Add Medication Button */}
         {!showAddMedication && (
-          <TouchableOpacity
-            style={styles.addButton}
+          <StyledTouchableOpacity
+            className="bg-[#83B4FF] py-3 px-6 rounded-lg mt-4 shadow-md"
             onPress={() => setShowAddMedication(true)}
           >
-            <Text style={styles.addButtonText}>
-              <Text style={styles.plusSign}>+</Text> Add Medication
-            </Text>
-          </TouchableOpacity>
+            <StyledText className="text-white text-lg font-bold text-center">
+              <StyledText className="text-xl font-bold mr-2">+</StyledText> Add
+              Medication
+            </StyledText>
+          </StyledTouchableOpacity>
         )}
 
         {/* Add Medication Form */}
@@ -104,11 +109,13 @@ const MedTracking = () => {
         {/* Medication Items */}
         {!showAddMedication && (
           <>
-            <Text style={styles.timeLabel}>8:30</Text>
-            <View style={styles.medicationItemsContainer}>
-              <TouchableOpacity style={styles.medicationItem}>
-                <TouchableOpacity
-                  style={styles.checkbox}
+            <StyledText className="mt-4 text-lg font-bold text-black">
+              8:30
+            </StyledText>
+            <StyledView className="mt-2 w-full">
+              <StyledTouchableOpacity className="bg-[#83B4FF] py-3 px-4 rounded-lg mt-2 w-full flex-row items-center shadow-md">
+                <StyledTouchableOpacity
+                  className="w-7 h-7 rounded-md border border-black items-center justify-center mr-4"
                   onPress={() =>
                     toggleStatus(
                       firstMedicationStatus,
@@ -116,20 +123,22 @@ const MedTracking = () => {
                     )
                   }
                 >
-                  <Text style={styles.checkboxText}>
+                  <StyledText className="text-lg">
                     {firstMedicationStatus === "tick"
                       ? "✔️"
                       : firstMedicationStatus === "cross"
                       ? "❌"
                       : ""}
-                  </Text>
-                </TouchableOpacity>
-                <Text style={styles.medicationText}>Paracetamol, 250 mg</Text>
-              </TouchableOpacity>
+                  </StyledText>
+                </StyledTouchableOpacity>
+                <StyledText className="text-lg text-black">
+                  Paracetamol, 250 mg
+                </StyledText>
+              </StyledTouchableOpacity>
 
-              <TouchableOpacity style={styles.medicationItem}>
-                <TouchableOpacity
-                  style={styles.checkbox}
+              <StyledTouchableOpacity className="bg-[#83B4FF] py-3 px-4 rounded-lg mt-2 w-full flex-row items-center shadow-md">
+                <StyledTouchableOpacity
+                  className="w-7 h-7 rounded-md border border-black items-center justify-center mr-4"
                   onPress={() =>
                     toggleStatus(
                       secondMedicationStatus,
@@ -137,20 +146,22 @@ const MedTracking = () => {
                     )
                   }
                 >
-                  <Text style={styles.checkboxText}>
+                  <StyledText className="text-lg">
                     {secondMedicationStatus === "tick"
                       ? "✔️"
                       : secondMedicationStatus === "cross"
                       ? "❌"
                       : ""}
-                  </Text>
-                </TouchableOpacity>
-                <Text style={styles.medicationText}>Losartan, 400 mg</Text>
-              </TouchableOpacity>
-            </View>
+                  </StyledText>
+                </StyledTouchableOpacity>
+                <StyledText className="text-lg text-black">
+                  Losartan, 400 mg
+                </StyledText>
+              </StyledTouchableOpacity>
+            </StyledView>
           </>
         )}
-      </View>
+      </StyledView>
     </SafeAreaView>
   );
 };
@@ -187,31 +198,35 @@ const AddMedication = ({ onClose }: { onClose: () => void }) => {
   };
 
   return (
-    <View style={styles.addMedicationContainer}>
-      <Text style={styles.label}>Name of Medication</Text>
-      <TextInput
-        style={styles.input}
+    <StyledView className="w-full">
+      <StyledText className="text-lg font-bold mb-2">
+        Name of Medication
+      </StyledText>
+      <StyledTextInput
+        className="h-10 border border-gray-300 rounded px-2 mb-4"
         placeholder="Enter medication name"
         value={medicationName}
         onChangeText={setMedicationName}
       />
 
-      <Text style={styles.label}>Dosage Strength</Text>
-      <TextInput
-        style={styles.input}
+      <StyledText className="text-lg font-bold mb-2">
+        Dosage Strength
+      </StyledText>
+      <StyledTextInput
+        className="h-10 border border-gray-300 rounded px-2 mb-4"
         placeholder="Enter dosage strength"
         value={dosageStrength}
         onChangeText={setDosageStrength}
         keyboardType="numeric"
       />
 
-      <Text style={styles.label}>Choose Unit</Text>
-      <TouchableOpacity
-        style={styles.button}
+      <StyledText className="text-lg font-bold mb-2">Choose Unit</StyledText>
+      <StyledTouchableOpacity
+        className="h-10 bg-[#83B4FF] rounded justify-center items-center mb-4"
         onPress={() => setShowUnitPicker(true)}
       >
-        <Text style={styles.buttonText}>{unit}</Text>
-      </TouchableOpacity>
+        <StyledText className="text-white text-lg">{unit}</StyledText>
+      </StyledTouchableOpacity>
 
       {showUnitPicker && (
         <Picker
@@ -229,15 +244,15 @@ const AddMedication = ({ onClose }: { onClose: () => void }) => {
         </Picker>
       )}
 
-      <Text style={styles.label}>Dosage Form</Text>
-      <TouchableOpacity
-        style={styles.button}
+      <StyledText className="text-lg font-bold mb-2">Dosage Form</StyledText>
+      <StyledTouchableOpacity
+        className="h-10 bg-[#83B4FF] rounded justify-center items-center mb-4"
         onPress={() => setShowFormPicker(true)}
       >
-        <Text style={styles.buttonText}>
+        <StyledText className="text-white text-lg">
           {dosageForm || "Select dosage form"}
-        </Text>
-      </TouchableOpacity>
+        </StyledText>
+      </StyledTouchableOpacity>
 
       {showFormPicker && (
         <Picker
@@ -254,13 +269,17 @@ const AddMedication = ({ onClose }: { onClose: () => void }) => {
         </Picker>
       )}
 
-      <Text style={styles.label}>Time to be Taken</Text>
-      <TouchableOpacity
-        style={styles.button}
+      <StyledText className="text-lg font-bold mb-2">
+        Time to be Taken
+      </StyledText>
+      <StyledTouchableOpacity
+        className="h-10 bg-[#83B4FF] rounded justify-center items-center mb-4"
         onPress={() => setShowTimePicker(true)}
       >
-        <Text style={styles.buttonText}>{formatTime(time)}</Text>
-      </TouchableOpacity>
+        <StyledText className="text-white text-lg">
+          {formatTime(time)}
+        </StyledText>
+      </StyledTouchableOpacity>
 
       {showTimePicker && (
         <DateTimePicker
@@ -272,181 +291,27 @@ const AddMedication = ({ onClose }: { onClose: () => void }) => {
       )}
 
       {Platform.OS === "ios" && showTimePicker && (
-        <TouchableOpacity style={styles.confirmButton} onPress={confirmTime}>
-          <Text style={styles.buttonText}>Confirm</Text>
-        </TouchableOpacity>
+        <StyledTouchableOpacity
+          className="h-10 bg-[#83B4FF] rounded justify-center items-center mb-4"
+          onPress={confirmTime}
+        >
+          <StyledText className="text-white text-lg">Confirm</StyledText>
+        </StyledTouchableOpacity>
       )}
 
-      <TouchableOpacity
-        style={styles.saveButton}
+      <StyledTouchableOpacity
+        className="bg-[#83B4FF] py-3 rounded-lg mt-4 shadow-md"
         onPress={() => {
           // Handle saving the medication
           onClose(); // Close the form
         }}
       >
-        <Text style={styles.saveButtonText}>Save Medication</Text>
-      </TouchableOpacity>
-    </View>
+        <StyledText className="text-white text-lg font-bold text-center">
+          Save Medication
+        </StyledText>
+      </StyledTouchableOpacity>
+    </StyledView>
   );
 };
 
 export default MedTracking;
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#FFFFFF",
-  },
-  container: {
-    padding: 16,
-    backgroundColor: "#FFFFFF",
-    alignItems: "center",
-  },
-  dateDisplay: {
-    fontSize: 20,
-    color: "#000000",
-    marginBottom: 16,
-    textAlign: "center",
-  },
-  dayCircles: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 16,
-    width: "100%",
-    maxWidth: 300,
-  },
-  dayCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#000000",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  selectedDayCircle: {
-    backgroundColor: "#83B4FF",
-  },
-  dayText: {
-    color: "#FFFFFF",
-  },
-  addButton: {
-    backgroundColor: "#83B4FF",
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    marginTop: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
-    elevation: 5,
-  },
-  addButtonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-  plusSign: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginRight: 8,
-  },
-  timeLabel: {
-    marginTop: 16,
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#000000",
-    textAlign: "left",
-    alignSelf: "flex-start",
-  },
-  medicationItemsContainer: {
-    marginTop: 8,
-    width: "100%",
-  },
-  medicationItem: {
-    backgroundColor: "#83B4FF",
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    marginTop: 8,
-    width: "100%",
-    flexDirection: "row",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 5,
-  },
-  checkbox: {
-    width: 30,
-    height: 30,
-    borderRadius: 5,
-    borderColor: "#000000",
-    borderWidth: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 16,
-  },
-  checkboxText: {
-    fontSize: 18,
-  },
-  medicationText: {
-    fontSize: 16,
-    color: "#000000",
-  },
-  addMedicationContainer: {
-    width: "100%",
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 8,
-  },
-  input: {
-    height: 40,
-    borderColor: "#CCCCCC",
-    borderWidth: 1,
-    borderRadius: 4,
-    paddingHorizontal: 8,
-    marginBottom: 16,
-  },
-  button: {
-    height: 40,
-    backgroundColor: "#83B4FF",
-    borderRadius: 4,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 16,
-  },
-  buttonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-  },
-  confirmButton: {
-    height: 40,
-    backgroundColor: "#83B4FF",
-    borderRadius: 4,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 16,
-  },
-  saveButton: {
-    backgroundColor: "#83B4FF",
-    paddingVertical: 12,
-    borderRadius: 8,
-    marginTop: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
-    elevation: 5,
-  },
-  saveButtonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-});

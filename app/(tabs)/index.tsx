@@ -1,12 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Modal,
-  StyleSheet,
-  ScrollView,
-} from "react-native";
+import { View, Text, TouchableOpacity, Modal, ScrollView } from "react-native";
 import {
   useFocusEffect,
   useNavigation,
@@ -134,9 +127,9 @@ const UserListScreen: React.FC = () => {
   return (
     <StyledView className="flex-1 flex-col py-10 bg-white">
       <StatusBar style="dark" />
-      <ScrollView contentContainerStyle={styles.scrollViewContent}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 10 }}>
         {isVisible && nextAppointment && (
-          <StyledView style={styles.notificationContainer}>
+          <StyledView className="absolute top-0 left-0 right-0 bg-[#FDFFE2] p-4 rounded-b-xl flex-row items-center z-60">
             <StyledText className="text-red-600 text-xl mr-2">⚠️</StyledText>
             <StyledText className="text-gray-800 text-sm font-bold flex-1 mr-2">
               Your{" "}
@@ -159,7 +152,7 @@ const UserListScreen: React.FC = () => {
           animationType="slide"
           onRequestClose={handleCloseModal}
         >
-          <StyledView className="flex-1 justify-center items-center bg-black bg-opacity-50">
+          <StyledView className="flex-1 justify-center items-center bg-white bg-opacity-50">
             <StyledView className="bg-white p-6 rounded-lg shadow-lg w-4/5">
               <StyledText className="text-lg font-bold mb-4">
                 Appointment Details
@@ -257,28 +250,5 @@ const App: React.FC = () => {
     </SQLiteProvider>
   );
 };
-
-const styles = StyleSheet.create({
-  scrollViewContent: {
-    flexGrow: 1,
-    paddingBottom: 10, // Adjust the bottom padding to ensure content doesn't get cut off
-  },
-  notificationContainer: {
-    position: "absolute",
-    top: 0, // Adjust this value to move the notification down
-    left: 0,
-    right: 0,
-    backgroundColor: "#FDFFE2", // Replace with your custom color
-    padding: 16,
-    borderBottomLeftRadius: 8,
-    borderBottomRightRadius: 8,
-    flexDirection: "row",
-    alignItems: "center",
-    zIndex: 60, // Ensure the notification is above other content
-  },
-  contentContainer: {
-    marginTop: 80, // Adjust this value to make sure the content is not covered
-  },
-});
 
 export default App;

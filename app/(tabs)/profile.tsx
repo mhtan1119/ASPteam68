@@ -10,12 +10,12 @@ import {
   Alert,
   Image,
 } from "react-native";
-import Icon from 'react-native-vector-icons/Ionicons';
-import { RadioButton } from 'react-native-paper';
-import DateTimePicker, { Event } from '@react-native-community/datetimepicker';
-import { Picker } from '@react-native-picker/picker';
-import * as ImagePicker from 'expo-image-picker';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from "react-native-vector-icons/Ionicons";
+import { RadioButton } from "react-native-paper";
+import DateTimePicker, { Event } from "@react-native-community/datetimepicker";
+import { Picker } from "@react-native-picker/picker";
+import * as ImagePicker from "expo-image-picker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ProfileEditPage: React.FC = () => {
   const [editing, setEditing] = useState(false);
@@ -34,7 +34,7 @@ const ProfileEditPage: React.FC = () => {
   useEffect(() => {
     const loadProfile = async () => {
       try {
-        const profileData = await AsyncStorage.getItem('userProfile');
+        const profileData = await AsyncStorage.getItem("userProfile");
         if (profileData) {
           const data = JSON.parse(profileData);
           setFullName(data.fullName || "");
@@ -49,15 +49,14 @@ const ProfileEditPage: React.FC = () => {
           setProfileImage(data.profileImage || null);
         }
       } catch (error) {
-        console.error('Error loading profile data', error);
+        console.error("Error loading profile data", error);
       }
     };
 
     loadProfile();
   }, []);
 
-
-  const handleDateChange = (event: Event, selectedDate?: Date) => {
+  const handleDateChange = (event: any, selectedDate?: Date) => {
     const currentDate = selectedDate || dateOfBirth;
     setShowDatePicker(false);
     setDateOfBirth(currentDate);
@@ -77,12 +76,12 @@ const ProfileEditPage: React.FC = () => {
         address,
         profileImage,
       };
-      
-      await AsyncStorage.setItem('userProfile', JSON.stringify(profileData));
+
+      await AsyncStorage.setItem("userProfile", JSON.stringify(profileData));
       Alert.alert("Profile Updated", "Your profile has been updated.");
       setEditing(false); // Switch back to profile view
     } catch (error) {
-      console.error('Error saving profile data', error);
+      console.error("Error saving profile data", error);
     }
   };
 
@@ -106,12 +105,17 @@ const ProfileEditPage: React.FC = () => {
         <View style={styles.profileContainer}>
           <View style={styles.headerContainer}>
             <Image
-              source={{ uri: profileImage || 'https://via.placeholder.com/150' }}
+              source={{
+                uri: profileImage || "https://via.placeholder.com/150",
+              }}
               style={styles.profileImage}
             />
             <View style={styles.greetingContainer}>
               <Text style={styles.greetingText}>Hi, {fullName}!</Text>
-              <Pressable style={styles.editButton} onPress={() => setEditing(true)}>
+              <Pressable
+                style={styles.editButton}
+                onPress={() => setEditing(true)}
+              >
                 <Text style={styles.buttonText}>Edit Profile</Text>
               </Pressable>
             </View>
@@ -138,7 +142,9 @@ const ProfileEditPage: React.FC = () => {
           <View style={styles.profilePicContainer}>
             <TouchableOpacity onPress={pickImage}>
               <Image
-                source={{ uri: profileImage || 'https://via.placeholder.com/150' }}
+                source={{
+                  uri: profileImage || "https://via.placeholder.com/150",
+                }}
                 style={styles.profileImageLarge}
               />
             </TouchableOpacity>
@@ -158,8 +164,8 @@ const ProfileEditPage: React.FC = () => {
               <View style={styles.radioButton}>
                 <RadioButton
                   value="male"
-                  status={gender === 'male' ? 'checked' : 'unchecked'}
-                  onPress={() => setGender('male')}
+                  status={gender === "male" ? "checked" : "unchecked"}
+                  onPress={() => setGender("male")}
                   color="#3F5F90"
                 />
                 <Text style={styles.radioText}>Male</Text>
@@ -167,8 +173,8 @@ const ProfileEditPage: React.FC = () => {
               <View style={styles.radioButton}>
                 <RadioButton
                   value="female"
-                  status={gender === 'female' ? 'checked' : 'unchecked'}
-                  onPress={() => setGender('female')}
+                  status={gender === "female" ? "checked" : "unchecked"}
+                  onPress={() => setGender("female")}
                   color="#3F5F90"
                 />
                 <Text style={styles.radioText}>Female</Text>
@@ -177,8 +183,16 @@ const ProfileEditPage: React.FC = () => {
           </View>
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Date of Birth</Text>
-            <TouchableOpacity style={styles.dateInput} onPress={() => setShowDatePicker(true)}>
-              <Icon name="calendar-outline" size={20} color="#3F5F90" style={styles.calendarIcon} />
+            <TouchableOpacity
+              style={styles.dateInput}
+              onPress={() => setShowDatePicker(true)}
+            >
+              <Icon
+                name="calendar-outline"
+                size={20}
+                color="#3F5F90"
+                style={styles.calendarIcon}
+              />
               <Text style={styles.dateText}>{dateOfBirth.toDateString()}</Text>
             </TouchableOpacity>
             {showDatePicker && (
@@ -284,8 +298,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   headerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 20,
     marginTop: 40, // Add margin top to move the content down
   },
@@ -294,25 +308,25 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 50,
     borderWidth: 2,
-    borderColor: '#3F5F90',
+    borderColor: "#3F5F90",
   },
   greetingContainer: {
     marginLeft: 20,
-    flexDirection: 'column',
-    alignItems: 'flex-start',
+    flexDirection: "column",
+    alignItems: "flex-start",
   },
   greetingText: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   editButton: {
-    backgroundColor: '#3F5F90',
+    backgroundColor: "#3F5F90",
     padding: 10,
     borderRadius: 5,
     marginTop: 10,
   },
   buttonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
   },
   settingsContainer: {
@@ -320,12 +334,12 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
   },
   link: {
     fontSize: 16,
-    color: '#808080',
+    color: "#808080",
     marginBottom: 10,
   },
   editView: {
@@ -334,12 +348,12 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
-    textAlign: 'center',
+    textAlign: "center",
   },
   profilePicContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 20,
   },
   profileImageLarge: {
@@ -347,36 +361,36 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 60,
     borderWidth: 2,
-    borderColor: '#3F5F90',
+    borderColor: "#3F5F90",
   },
   inputContainer: {
     marginBottom: 20,
   },
   label: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 8,
   },
   input: {
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderWidth: 1,
     borderRadius: 5,
     padding: 10,
     fontSize: 16,
   },
   textArea: {
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderWidth: 1,
     borderRadius: 5,
     padding: 10,
     fontSize: 16,
     height: 80,
-    textAlignVertical: 'top',
+    textAlignVertical: "top",
   },
   dateInput: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderColor: '#ddd',
+    flexDirection: "row",
+    alignItems: "center",
+    borderColor: "#ddd",
     borderWidth: 1,
     borderRadius: 5,
     padding: 10,
@@ -389,8 +403,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   rowContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   columnContainer: {
     flex: 1,
@@ -399,37 +413,37 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   pickerContainer: {
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderWidth: 1,
     borderRadius: 5,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   picker: {
     height: 40,
-    width: '100%',
+    width: "100%",
   },
   radioContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   radioButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   radioText: {
     fontSize: 16,
     marginLeft: 8,
   },
   buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   button: {
-    backgroundColor: '#3F5F90',
+    backgroundColor: "#3F5F90",
     padding: 10,
     borderRadius: 5,
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
     marginHorizontal: 5,
   },
 });

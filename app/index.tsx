@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import {
-  StyleSheet,
   Text,
   View,
   TextInput,
@@ -12,6 +11,7 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import { Checkbox } from "react-native-paper";
 import { SQLiteProvider, useSQLiteContext } from "expo-sqlite";
 import { router } from "expo-router";
+import { styled } from "nativewind";
 
 // Initialize the database
 const initializeDatabase = async (db: any) => {
@@ -104,7 +104,6 @@ const LoginScreen: React.FC<{
       if (validUser) {
         Alert.alert("Success", "Login successful");
         router.navigate("/(tabs)/");
-        // navigate("Home", userName);
         setUserName("");
         setPassword("");
       } else {
@@ -123,12 +122,12 @@ const LoginScreen: React.FC<{
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Email</Text>
+    <View className="flex-1 justify-center p-4 bg-white items-center mt-[-50px]">
+      <Text className="text-[#3F5F90] text-2xl font-bold mb-6">Login</Text>
+      <View className="w-4/5 my-1">
+        <Text className="font-bold text-lg mb-1">Email</Text>
         <TextInput
-          style={styles.input}
+          className="p-2 border border-gray-300 rounded"
           placeholder="Enter your email"
           value={userName}
           onChangeText={setUserName}
@@ -136,20 +135,17 @@ const LoginScreen: React.FC<{
           autoCapitalize="none"
         />
       </View>
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Password</Text>
-        <View style={styles.passwordWrapper}>
+      <View className="w-4/5 my-1">
+        <Text className="font-bold text-lg mb-1">Password</Text>
+        <View className="flex-row items-center border border-gray-300 rounded px-2">
           <TextInput
-            style={styles.passwordInput}
+            className="flex-1 py-2"
             placeholder="Enter your password"
             value={password}
             onChangeText={setPassword}
             secureTextEntry={!showPassword}
           />
-          <TouchableOpacity
-            style={styles.eyeIcon}
-            onPress={() => setShowPassword(!showPassword)}
-          >
+          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
             <Icon
               name={showPassword ? "visibility" : "visibility-off"}
               size={24}
@@ -158,31 +154,31 @@ const LoginScreen: React.FC<{
           </TouchableOpacity>
         </View>
         {passwordError ? (
-          <Text style={styles.passwordError}>{`* ${passwordError}`}</Text>
+          <Text className="text-red-500 text-sm mt-2">{`* ${passwordError}`}</Text>
         ) : null}
       </View>
-      <View style={styles.checkboxContainer}>
-        <View style={styles.checkboxRow}>
+      <View className="w-4/5 flex-row justify-between items-center">
+        <View className="flex-row items-center">
           <Checkbox
             status={rememberMe ? "checked" : "unchecked"}
             onPress={() => setRememberMe(!rememberMe)}
           />
-          <Text style={styles.checkboxLabel}>Remember Me</Text>
+          <Text className="text-sm ml-2">Remember Me</Text>
         </View>
-        <TouchableOpacity
-          onPress={handleForgotPassword}
-          style={styles.forgotPasswordLink}
-        >
-          <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+        <TouchableOpacity onPress={handleForgotPassword}>
+          <Text className="text-[#007BFF] text-sm">Forgot Password?</Text>
         </TouchableOpacity>
       </View>
-      <Pressable style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Login</Text>
+      <Pressable
+        className="w-4/5 p-3 bg-[#3F5F90] rounded mt-3 items-center"
+        onPress={handleLogin}
+      >
+        <Text className="text-white text-lg font-bold">Login</Text>
       </Pressable>
-      <View style={styles.signUpContainer}>
-        <Text style={styles.linkText1}>Don't have an account?</Text>
-        <Pressable style={styles.link} onPress={() => navigate("Register")}>
-          <Text style={styles.linkText}> Sign Up </Text>
+      <View className="flex-row mt-5">
+        <Text className="text-base text-gray-500">Don't have an account?</Text>
+        <Pressable className="ml-2" onPress={() => navigate("Register")}>
+          <Text className="text-[#007BFF] text-base font-bold">Sign Up</Text>
         </Pressable>
       </View>
     </View>
@@ -245,19 +241,18 @@ const RegisterScreen: React.FC<{
       );
       Alert.alert("Success", "Registration successful!");
       router.navigate("/(tabs)/");
-      // navigate("Home", userName);
     } catch (error) {
       console.log("Error during registration:", error);
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Sign Up</Text>
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Email</Text>
+    <View className="flex-1 justify-center p-4 bg-white items-center mt-[-50px]">
+      <Text className="text-[#3F5F90] text-2xl font-bold mb-6">Sign Up</Text>
+      <View className="w-4/5 my-1">
+        <Text className="font-bold text-lg mb-1">Email</Text>
         <TextInput
-          style={styles.input}
+          className="p-2 border border-gray-300 rounded"
           placeholder="Enter your email"
           value={userName}
           onChangeText={setUserName}
@@ -265,11 +260,11 @@ const RegisterScreen: React.FC<{
           autoCapitalize="none"
         />
       </View>
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Password</Text>
-        <View style={styles.passwordWrapper}>
+      <View className="w-4/5 my-1">
+        <Text className="font-bold text-lg mb-1">Password</Text>
+        <View className="flex-row items-center border border-gray-300 rounded px-2">
           <TextInput
-            style={styles.passwordInput}
+            className="flex-1 py-2"
             placeholder="Enter your password"
             value={password}
             onChangeText={(text) => {
@@ -278,10 +273,7 @@ const RegisterScreen: React.FC<{
             }}
             secureTextEntry={!showPassword}
           />
-          <TouchableOpacity
-            style={styles.eyeIcon}
-            onPress={() => setShowPassword(!showPassword)}
-          >
+          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
             <Icon
               name={showPassword ? "visibility" : "visibility-off"}
               size={24}
@@ -290,21 +282,20 @@ const RegisterScreen: React.FC<{
           </TouchableOpacity>
         </View>
         {passwordError ? (
-          <Text style={styles.passwordError}>{`* ${passwordError}`}</Text>
+          <Text className="text-red-500 text-sm mt-2">{`* ${passwordError}`}</Text>
         ) : null}
       </View>
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Repeat Password</Text>
-        <View style={styles.passwordWrapper}>
+      <View className="w-4/5 my-1">
+        <Text className="font-bold text-lg mb-1">Repeat Password</Text>
+        <View className="flex-row items-center border border-gray-300 rounded px-2">
           <TextInput
-            style={styles.passwordInput}
+            className="flex-1 py-2"
             placeholder="Repeat your password"
             value={repeatPassword}
             onChangeText={setRepeatPassword}
             secureTextEntry={!showRepeatPassword}
           />
           <TouchableOpacity
-            style={styles.eyeIcon}
             onPress={() => setShowRepeatPassword(!showRepeatPassword)}
           >
             <Icon
@@ -315,13 +306,18 @@ const RegisterScreen: React.FC<{
           </TouchableOpacity>
         </View>
       </View>
-      <Pressable style={styles.button} onPress={handleRegister}>
-        <Text style={styles.buttonText}>Sign Up</Text>
+      <Pressable
+        className="w-4/5 p-3 bg-[#3F5F90] rounded mt-3 items-center"
+        onPress={handleRegister}
+      >
+        <Text className="text-white text-lg font-bold">Sign Up</Text>
       </Pressable>
-      <View style={styles.signUpContainer}>
-        <Text style={styles.linkText1}>Already have an account?</Text>
-        <Pressable style={styles.link} onPress={() => navigate("Login")}>
-          <Text style={styles.linkText}> Log In </Text>
+      <View className="flex-row mt-5">
+        <Text className="text-base text-gray-500">
+          Already have an account?
+        </Text>
+        <Pressable className="ml-2" onPress={() => navigate("Login")}>
+          <Text className="text-[#007BFF] text-base font-bold">Log In</Text>
         </Pressable>
       </View>
     </View>
@@ -334,121 +330,16 @@ const HomeScreen: React.FC<{
   navigate: (screen: "Login" | "Register" | "Home") => void;
 }> = ({ user, navigate }) => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Welcome, {user}</Text>
-      <Pressable style={styles.button} onPress={() => navigate("Login")}>
-        <Text style={styles.buttonText}>Logout</Text>
+    <View className="flex-1 justify-center p-4 bg-white items-center mt-[-50px]">
+      <Text className="text-[#3F5F90] text-2xl font-bold mb-6">
+        Welcome, {user}
+      </Text>
+      <Pressable
+        className="w-4/5 p-3 bg-[#3F5F90] rounded mt-3 items-center"
+        onPress={() => navigate("Login")}
+      >
+        <Text className="text-white text-lg font-bold">Logout</Text>
       </Pressable>
     </View>
   );
 };
-
-// Styles
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    padding: 16,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    marginTop: -50,
-  },
-  title: {
-    color: "#3F5F90",
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 24,
-  },
-  inputContainer: {
-    width: "80%",
-    marginVertical: 5,
-  },
-  label: {
-    fontWeight: "bold",
-    fontSize: 16,
-    marginBottom: 4,
-  },
-  input: {
-    padding: 10,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 5,
-  },
-  passwordWrapper: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    paddingHorizontal: 10,
-  },
-  passwordInput: {
-    flex: 1,
-    paddingVertical: 10,
-  },
-  eyeIcon: {
-    position: "absolute",
-    right: 10,
-    padding: 10,
-    marginLeft: 10,
-  },
-  checkboxContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    width: "80%",
-  },
-  checkboxRow: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  checkboxLabel: {
-    fontSize: 14,
-    marginLeft: 5,
-  },
-  forgotPasswordLink: {
-    marginLeft: 16,
-    paddingVertical: 5,
-  },
-  forgotPasswordText: {
-    color: "#007BFF",
-    fontSize: 14,
-    textAlign: "right",
-  },
-  button: {
-    width: "80%",
-    padding: 10,
-    backgroundColor: "#3F5F90",
-    borderRadius: 5,
-    marginVertical: 10,
-    alignItems: "center",
-  },
-  buttonText: {
-    fontSize: 16,
-    color: "#fff",
-    textAlign: "center",
-    fontWeight: "bold",
-  },
-  signUpContainer: {
-    flexDirection: "row",
-    marginTop: 20,
-  },
-  link: {
-    color: "#808080",
-    marginLeft: 5,
-  },
-  linkText1: {
-    fontSize: 16,
-    color: "#808080",
-  },
-  linkText: {
-    fontSize: 16,
-    color: "#007BFF",
-    fontWeight: "bold",
-  },
-  passwordError: {
-    fontSize: 14,
-    color: "red",
-    marginTop: 5,
-  },
-});
