@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -15,6 +15,7 @@ import { RadioButton } from 'react-native-paper';
 import DateTimePicker, { Event } from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ProfileEditPage: React.FC = () => {
   const [editing, setEditing] = useState(false);
@@ -30,16 +31,59 @@ const ProfileEditPage: React.FC = () => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
 
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const profileData = await AsyncStorage.getItem('userProfile');
+        if (profileData) {
+          const data = JSON.parse(profileData);
+          setFullName(data.fullName || "");
+          setGender(data.gender || "male");
+          setDateOfBirth(new Date(data.dateOfBirth) || new Date());
+          setHeight(data.height || "");
+          setWeight(data.weight || "");
+          setBloodType(data.bloodType || "");
+          setAllergies(data.allergies || "");
+          setPhoneNumber(data.phoneNumber || "");
+          setAddress(data.address || "");
+          setProfileImage(data.profileImage || null);
+        }
+      } catch (error) {
+        console.error('Error loading profile data', error);
+      }
+    };
+
+    loadProfile();
+  }, []);
+
+
   const handleDateChange = (event: Event, selectedDate?: Date) => {
     const currentDate = selectedDate || dateOfBirth;
     setShowDatePicker(false);
     setDateOfBirth(currentDate);
   };
 
-  const handleSave = () => {
-    // Handle save logic here
-    Alert.alert("Profile Updated", "Your profile has been updated.");
-    setEditing(false); // Switch back to profile view
+  const handleSave = async () => {
+    try {
+      const profileData = {
+        fullName,
+        gender,
+        dateOfBirth: dateOfBirth.toISOString(), // Save date as ISO string
+        height,
+        weight,
+        bloodType,
+        allergies,
+        phoneNumber,
+        address,
+        profileImage,
+      };
+      
+      await AsyncStorage.setItem('userProfile', JSON.stringify(profileData));
+      Alert.alert("Profile Updated", "Your profile has been updated.");
+      setEditing(false); // Switch back to profile view
+    } catch (error) {
+      console.error('Error saving profile data', error);
+    }
   };
 
   const pickImage = async () => {
@@ -66,7 +110,7 @@ const ProfileEditPage: React.FC = () => {
               style={styles.profileImage}
             />
             <View style={styles.greetingContainer}>
-              <Text style={styles.greetingText}>Hi, User!</Text>
+              <Text style={styles.greetingText}>Hi, {fullName}!</Text>
               <Pressable style={styles.editButton} onPress={() => setEditing(true)}>
                 <Text style={styles.buttonText}>Edit Profile</Text>
               </Pressable>
