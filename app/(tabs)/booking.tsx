@@ -57,7 +57,7 @@ const initializeDatabase = async (db: any) => {
 
 export default function App() {
   return (
-    <SQLiteProvider databaseName="appointment7.db" onInit={initializeDatabase}>
+    <SQLiteProvider databaseName="appointment11.db" onInit={initializeDatabase}>
       <Booking />
     </SQLiteProvider>
   );
@@ -73,10 +73,9 @@ function Booking() {
     date: passedDate,
     time: passedTime,
     remarks: passedRemarks,
-    clearForm, // Add this to retrieve the clearForm parameter
-  } = useLocalSearchParams(); // Retrieve passed service, location, date, time, and remarks
+    clearForm,
+  } = useLocalSearchParams();
 
-  // Extract healthcare facility names dynamically from the imported data
   const healthcareFacilityNames = allLocations.map((location) => location.name);
 
   const timeOptions = [];
@@ -112,7 +111,7 @@ function Booking() {
   const [tempTime, setTempTime] = useState(time);
 
   useEffect(() => {
-    if (locationName) setLocation(locationName); // Prefill the location from the database
+    if (locationName) setLocation(locationName);
     if (passedService) setService(passedService);
     if (passedLocation) setLocation(passedLocation);
     if (passedDate) {
@@ -126,7 +125,7 @@ function Booking() {
   useEffect(() => {
     if (clearForm) {
       setService("");
-      setDate(new Date()); // Reset date to the current date
+      setDate(new Date());
       setTime("");
       setRemarks("");
       setSymptoms(0);
@@ -145,11 +144,10 @@ function Booking() {
     setService(tempService);
     setServiceModalVisible(false);
   };
-  // Inside the Booking component
+
   useFocusEffect(
     useCallback(() => {
-      // Logic to fetch or update data here, if needed
-      if (locationName) setLocation(locationName); // Update the location with the latest value
+      if (locationName) setLocation(locationName);
       if (passedService) setService(passedService);
       if (passedLocation) setLocation(passedLocation);
       if (passedDate) {
@@ -162,6 +160,7 @@ function Booking() {
       if (passedRemarks) setRemarks(passedRemarks);
     }, [locationName, passedService, passedDate, passedTime, passedRemarks])
   );
+
   const handleLocationSelect = () => {
     setLocation(tempLocation);
     setLocationModalVisible(false);
@@ -171,11 +170,19 @@ function Booking() {
     setTime(tempTime);
     setTimeModalVisible(false);
   };
-
   const handleDateChange = (event: any, selectedDate: Date | undefined) => {
     const currentDate = selectedDate || date;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set to midnight to avoid time comparison issues
+
+    if (currentDate >= today) {
+      // Ensure the selected date is today or a future date
+      setDate(currentDate);
+    } else {
+      Alert.alert("Invalid Date", "You cannot select a past date.");
+    }
+
     setShowDatePicker(Platform.OS === "ios");
-    setDate(currentDate);
   };
 
   const handleSaveAppointment = async () => {
@@ -298,6 +305,7 @@ function Booking() {
             value={date}
             mode="date"
             display="default"
+            minimumDate={new Date()} // Prevent selection of past dates
             onChange={handleDateChange}
           />
         )}
