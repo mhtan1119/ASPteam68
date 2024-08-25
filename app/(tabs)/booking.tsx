@@ -14,6 +14,7 @@ import { Picker } from "@react-native-picker/picker";
 import RadioForm from "react-native-simple-radio-button";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { styled } from "nativewind";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   SQLiteBindParams,
   SQLiteProvider,
@@ -29,6 +30,7 @@ import {
 } from "@/constants/hospitalData";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
+
 const StyledSafeAreaView = styled(SafeAreaView);
 const StyledScrollView = styled(ScrollView);
 const StyledText = styled(Text);
@@ -75,6 +77,27 @@ function Booking() {
     remarks: passedRemarks,
     clearForm,
   } = useLocalSearchParams();
+
+  const [userName, setUserName] = useState("");
+
+  // Fetch the user's name whenever the screen is focused
+  useFocusEffect(
+    useCallback(() => {
+      const fetchUserName = async () => {
+        try {
+          const profileData = await AsyncStorage.getItem("userProfile");
+          if (profileData) {
+            const data = JSON.parse(profileData);
+            setUserName(data.fullName || "");
+          }
+        } catch (error) {
+          console.error("Error fetching user name:", error);
+        }
+      };
+
+      fetchUserName();
+    }, [])
+  );
 
   const healthcareFacilityNames = allLocations.map((location) => location.name);
 
@@ -170,6 +193,7 @@ function Booking() {
     setTime(tempTime);
     setTimeModalVisible(false);
   };
+
   const handleDateChange = (event: any, selectedDate: Date | undefined) => {
     const currentDate = selectedDate || date;
     const today = new Date();
@@ -211,10 +235,10 @@ function Booking() {
           APPOINTMENTS
         </StyledText>
 
-        <StyledTextInput
-          placeholder="Patient’s Name"
-          className="h-10 border border-gray-300 rounded px-2 mb-4 bg-white"
-        />
+        {/* Display user’s name above services */}
+        <StyledText className="text-lg font-semibold mb-4">
+          Name: {userName}
+        </StyledText>
 
         <StyledText className="font-bold mb-2">Services</StyledText>
         <StyledTouchableOpacity
