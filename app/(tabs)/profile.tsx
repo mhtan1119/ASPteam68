@@ -38,6 +38,12 @@ const ProfileEditPage: React.FC = () => {
   const [address, setAddress] = useState("");
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [errors, setErrors] = useState({
+    fullName: '',
+    phoneNumber: '',
+    height: '',
+    weight: '',
+  });
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -74,30 +80,36 @@ const ProfileEditPage: React.FC = () => {
     setDateOfBirth(currentDate);
   };
 
+  
+
   const handleSave = async () => {
-    try {
-      const profileData = {
-        fullName,
-        gender,
-        dateOfBirth: dateOfBirth.toISOString(), // Save date as ISO string
-        height,
-        weight,
-        bloodType,
-        allergies,
-        phoneNumber,
-        address,
-        profileImage,
-      };
+    validateFullName(fullName);
+    validatePhoneNumber(phoneNumber);
+    if (!errors.fullName && !errors.phoneNumber) {
+      try {
+        const profileData = {
+          fullName,
+          gender,
+          dateOfBirth: dateOfBirth.toISOString(), // Save date as ISO string
+          height,
+          weight,
+          bloodType,
+          allergies,
+          phoneNumber,
+          address,
+          profileImage,
+        };
 
-      await AsyncStorage.setItem("userProfile", JSON.stringify(profileData));
-      Alert.alert("Profile Updated", "Your profile has been updated.");
-      setEditing(false);
+        await AsyncStorage.setItem("userProfile", JSON.stringify(profileData));
+        Alert.alert("Profile Updated", "Your profile has been updated.");
+        setEditing(false);
 
-      // Update the displayed state after saving
-      setDisplayFullName(fullName);
-      setDisplayProfileImage(profileImage);
-    } catch (error) {
-      console.error("Error saving profile data", error);
+        // Update the displayed state after saving
+        setDisplayFullName(fullName);
+        setDisplayProfileImage(profileImage);
+      } catch (error) {
+        console.error("Error saving profile data", error);
+      }
     }
   };
 
@@ -114,6 +126,41 @@ const ProfileEditPage: React.FC = () => {
       setProfileImage(imageUri);
     }
   };
+
+  const validateFullName = (fullName: string) => {
+    let error = '';
+    if (fullName.trim() === '') {
+      error = 'Full name is required.';
+    }
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      fullName: error,
+    }));
+  };
+
+  const validatePhoneNumber = (phoneNumber: string) => {
+    let error = '';
+    const phonePattern = /^[0-9]{8}$/;
+
+    if (!phonePattern.test(phoneNumber)) {
+      error = 'Phone number must be exactly 8 digits.';
+    }
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      phoneNumber: error,
+    }));
+  };
+
+  const handleFullNameChange = (text: string) => {
+    setFullName(text);
+    validateFullName(text);
+  };
+
+  const handlePhoneNumberChange = (text: string) => {
+    setPhoneNumber(text);
+    validatePhoneNumber(text);
+  };
+
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -168,11 +215,12 @@ const ProfileEditPage: React.FC = () => {
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Full Name</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, errors.fullName ? styles.errorInput : null]}
               placeholder="Enter full name"
               value={fullName}
-              onChangeText={setFullName}
+              onChangeText={handleFullNameChange}
             />
+            {errors.fullName && <Text style={styles.errorText}>{errors.fullName}</Text>}
           </View>
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Gender</Text>
@@ -224,22 +272,24 @@ const ProfileEditPage: React.FC = () => {
             <View style={styles.columnContainer}>
               <Text style={styles.label}>Height (cm)</Text>
               <TextInput
-                style={styles.input}
+                style={[styles.input,errors.height ? styles.errorInput : null]}
                 keyboardType="numeric"
                 placeholder="Enter height"
                 value={height}
                 onChangeText={setHeight}
               />
+               {errors.height && <Text style={styles.errorText}>{errors.height}</Text>}
             </View>
             <View style={[styles.columnContainer, styles.columnSpacing]}>
               <Text style={styles.label}>Weight (kg)</Text>
               <TextInput
-                style={styles.input}
+                style={[styles.input,errors.weight ? styles.errorInput : null]}
                 keyboardType="numeric"
                 placeholder="Enter weight"
                 value={weight}
                 onChangeText={setWeight}
               />
+               {errors.weight && <Text style={styles.errorText}>{errors.weight}</Text>}
             </View>
           </View>
           <View style={styles.inputContainer}>
@@ -272,13 +322,14 @@ const ProfileEditPage: React.FC = () => {
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Phone Number</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input,errors.phoneNumber ? styles.errorInput : null]}
               placeholder="Enter your phone number"
               value={phoneNumber}
-              onChangeText={setPhoneNumber}
+              onChangeText={handlePhoneNumberChange}
               keyboardType="phone-pad"
               maxLength={8}
             />
+            {errors.phoneNumber && <Text style={styles.errorText}>{errors.phoneNumber}</Text>}
           </View>
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Address</Text>
@@ -461,6 +512,17 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     marginHorizontal: 5,
+  },
+  errorInput: {
+    borderColor: 'red', // Red border to indicate an error
+    borderWidth: 1, // Border width
+  },
+
+  // Style for error text
+  errorText: {
+    color: 'red', // Red color for error text
+    fontSize: 12, // Font size
+    marginTop: 4, // Margin to separate from the input field
   },
 });
 
