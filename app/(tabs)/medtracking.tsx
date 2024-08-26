@@ -77,11 +77,11 @@ const MedTracking = () => {
   ];
 
   const [selectedDayIndex, setSelectedDayIndex] = useState<number>(2); // Start with the middle day selected
-  const [firstMedicationStatus, setFirstMedicationStatus] =
-    useState<string>(""); // '', 'tick', 'cross'
-  const [secondMedicationStatus, setSecondMedicationStatus] =
-    useState<string>(""); // '', 'tick', 'cross'
   const [showAddMedication, setShowAddMedication] = useState(false); // To toggle add medication form visibility
+  const [medicationStatuses, setMedicationStatuses] = useState<
+    Record<number, string>
+  >({}); // Store medication statuses
+
   interface Medication {
     id: number;
     name: string;
@@ -89,10 +89,10 @@ const MedTracking = () => {
     unit: string;
     dosageForm: string;
     time: string;
-    date: string; // Add date field here
+    date: string;
   }
 
-  const [medications, setMedications] = useState<Medication[]>([]); // State to store medications
+  const [medications, setMedications] = useState<Medication[]>([]);
 
   useEffect(() => {
     fetchMedications();
@@ -111,18 +111,21 @@ const MedTracking = () => {
     setSelectedDayIndex(index);
   };
 
-  const toggleStatus = (
-    status: string,
-    setStatus: React.Dispatch<React.SetStateAction<string>>
-  ) => {
-    if (status === "") {
-      setStatus("tick");
-    } else if (status === "tick") {
-      setStatus("cross");
-    } else {
-      setStatus("");
-    }
+  const groupMedicationsByTime = (medications: Medication[]) => {
+    return medications.reduce((acc, medication) => {
+      if (!acc[medication.time]) {
+        acc[medication.time] = [];
+      }
+      acc[medication.time].push(medication);
+      return acc;
+    }, {} as Record<string, Medication[]>);
   };
+
+  const filteredMedications = groupMedicationsByTime(
+    medications.filter(
+      (medication) => medication.date === orderedDays[selectedDayIndex]
+    )
+  );
 
   const saveMedication = async (
     name: string,
@@ -130,7 +133,7 @@ const MedTracking = () => {
     unit: string,
     dosageForm: string,
     time: string,
-    date: string // Add date as a parameter
+    date: string
   ) => {
     try {
       await db.runAsync(
@@ -142,6 +145,18 @@ const MedTracking = () => {
     } catch (error) {
       console.log("Error saving medication:", error);
     }
+  };
+
+  const toggleMedicationStatus = (id: number) => {
+    setMedicationStatuses((prevStatuses) => {
+      const newStatus =
+        prevStatuses[id] === "tick"
+          ? "cross"
+          : prevStatuses[id] === "cross"
+          ? ""
+          : "tick";
+      return { ...prevStatuses, [id]: newStatus };
+    });
   };
 
   return (
@@ -179,12 +194,13 @@ const MedTracking = () => {
               className="bg-customBlue py-3 px-6 rounded-lg mt-4 shadow-md"
               onPress={() => setShowAddMedication(true)}
             >
-              <StyledText className="text-white text-lg font-bold text-center">
-                <StyledText className="text-xl font-bold mr-2">+</StyledText>
-                {" Add Medication"}
+              <StyledText className="text-black text-lg font-bold text-center">
+                <StyledText className="text-xl font-bold mr-2">+</StyledText>{" "}
+                Add Medication
               </StyledText>
             </StyledTouchableOpacity>
           )}
+
           {/* Add Medication Form */}
           {showAddMedication && (
             <AddMedication
@@ -205,29 +221,45 @@ const MedTracking = () => {
           {/* Medication Items */}
           {!showAddMedication && (
             <StyledView className="mt-8 w-full">
-              {medications.length > 0 ? (
-                medications.map((medication) => (
-                  <StyledView
-                    key={medication.id}
-                    className="mb-4 p-4 border rounded-lg bg-gray-100"
-                  >
-                    <StyledText className="text-lg font-bold">
-                      {medication.name}
+              {Object.keys(filteredMedications).length > 0 ? (
+                Object.entries(filteredMedications).map(([time, meds]) => (
+                  <React.Fragment key={time}>
+                    <StyledText className="text-lg font-bold mb-2">
+                      {time} {/* Time displayed outside the box */}
                     </StyledText>
-                    <StyledText>
-                      {`${medication.dosageStrength} ${medication.unit} - ${medication.dosageForm}`}
-                    </StyledText>
-                    <StyledText className="text-gray-600">
-                      {`Time: ${medication.time}`}
-                    </StyledText>
-                    <StyledText className="text-gray-600">
-                      {`Date: ${medication.date}`}
-                    </StyledText>
-                  </StyledView>
+                    {meds.map((medication) => (
+                      <StyledView
+                        key={medication.id}
+                        className="mb-4 p-4 border rounded-lg bg-customBlue flex-row items-center"
+                      >
+                        <StyledTouchableOpacity
+                          className="w-8 h-8 border border-black rounded-sm mr-4 items-center justify-center bg-white"
+                          onPress={() => toggleMedicationStatus(medication.id)}
+                        >
+                          <StyledText className="text-xl">
+                            {medicationStatuses[medication.id] === "tick"
+                              ? "✔️"
+                              : medicationStatuses[medication.id] === "cross"
+                              ? "❌"
+                              : ""}
+                          </StyledText>
+                        </StyledTouchableOpacity>
+                        <StyledView>
+                          <StyledText className="text-lg font-bold text-black">
+                            {medication.name}
+                          </StyledText>
+                          <StyledText className="text-black">
+                            {medication.dosageStrength} {medication.unit} -{" "}
+                            {medication.dosageForm}
+                          </StyledText>
+                        </StyledView>
+                      </StyledView>
+                    ))}
+                  </React.Fragment>
                 ))
               ) : (
                 <StyledText className="text-center text-gray-500">
-                  No medications added.
+                  No medications found for the selected day.
                 </StyledText>
               )}
             </StyledView>
