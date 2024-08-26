@@ -6,6 +6,7 @@ import {
   Text,
   TextInput,
   Platform,
+  ScrollView,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -64,104 +65,108 @@ const MedTracking = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <StyledView className="p-4 items-center">
-        {/* Date Display */}
-        <StyledText className="text-2xl text-black mb-4 text-center">
-          {orderedDays[selectedDayIndex]},{" "}
-          {moment()
-            .add(selectedDayIndex - 2, "days")
-            .format("D MMM")}
-        </StyledText>
+      <ScrollView contentContainerStyle={{ padding: 16 }}>
+        <StyledView className="items-center">
+          {/* Date Display */}
+          <StyledText className="text-2xl text-black mb-4 text-center">
+            {orderedDays[selectedDayIndex]},{" "}
+            {moment()
+              .add(selectedDayIndex - 2, "days")
+              .format("D MMM")}
+          </StyledText>
 
-        {/* Day Circles */}
-        <StyledView className="flex-row justify-between mb-4 w-full max-w-[300px]">
-          {orderedDays.map((day, index) => (
+          {/* Day Circles */}
+          <StyledView className="flex-row justify-between mb-4 w-full max-w-[300px]">
+            {orderedDays.map((day, index) => (
+              <StyledTouchableOpacity
+                key={index}
+                className={`w-10 h-10 rounded-full items-center justify-center ${
+                  index === selectedDayIndex ? "bg-customBlue" : "bg-black"
+                }`}
+                onPress={() => handleDayPress(index)}
+              >
+                <StyledText className="text-white">
+                  {day.slice(0, 3)}
+                </StyledText>
+              </StyledTouchableOpacity>
+            ))}
+          </StyledView>
+
+          {/* Add Medication Button */}
+          {!showAddMedication && (
             <StyledTouchableOpacity
-              key={index}
-              className={`w-10 h-10 rounded-full items-center justify-center ${
-                index === selectedDayIndex ? "bg-customBlue" : "bg-black"
-              }`}
-              onPress={() => handleDayPress(index)}
+              className="bg-customBlue py-3 px-6 rounded-lg mt-4 shadow-md"
+              onPress={() => setShowAddMedication(true)}
             >
-              <StyledText className="text-white">{day.slice(0, 3)}</StyledText>
+              <StyledText className="text-white text-lg font-bold text-center">
+                <StyledText className="text-xl font-bold mr-2">+</StyledText>{" "}
+                Add Medication
+              </StyledText>
             </StyledTouchableOpacity>
-          ))}
+          )}
+
+          {/* Add Medication Form */}
+          {showAddMedication && (
+            <AddMedication onClose={() => setShowAddMedication(false)} />
+          )}
+
+          {/* Medication Items */}
+          {!showAddMedication && (
+            <>
+              <StyledText className="mt-4 text-lg font-bold text-black">
+                8:30
+              </StyledText>
+              <StyledView className="mt-2 w-full">
+                <StyledTouchableOpacity className="bg-customBlue py-3 px-4 rounded-lg mt-2 w-full flex-row items-center shadow-md">
+                  <StyledTouchableOpacity
+                    className="w-7 h-7 rounded-md border border-black items-center justify-center mr-4"
+                    onPress={() =>
+                      toggleStatus(
+                        firstMedicationStatus,
+                        setFirstMedicationStatus
+                      )
+                    }
+                  >
+                    <StyledText className="text-lg">
+                      {firstMedicationStatus === "tick"
+                        ? "✔️"
+                        : firstMedicationStatus === "cross"
+                        ? "❌"
+                        : ""}
+                    </StyledText>
+                  </StyledTouchableOpacity>
+                  <StyledText className="text-lg text-black">
+                    Paracetamol, 250 mg
+                  </StyledText>
+                </StyledTouchableOpacity>
+
+                <StyledTouchableOpacity className="bg-customBlue py-3 px-4 rounded-lg mt-2 w-full flex-row items-center shadow-md">
+                  <StyledTouchableOpacity
+                    className="w-7 h-7 rounded-md border border-black items-center justify-center mr-4"
+                    onPress={() =>
+                      toggleStatus(
+                        secondMedicationStatus,
+                        setSecondMedicationStatus
+                      )
+                    }
+                  >
+                    <StyledText className="text-lg">
+                      {secondMedicationStatus === "tick"
+                        ? "✔️"
+                        : secondMedicationStatus === "cross"
+                        ? "❌"
+                        : ""}
+                    </StyledText>
+                  </StyledTouchableOpacity>
+                  <StyledText className="text-lg text-black">
+                    Losartan, 400 mg
+                  </StyledText>
+                </StyledTouchableOpacity>
+              </StyledView>
+            </>
+          )}
         </StyledView>
-
-        {/* Add Medication Button */}
-        {!showAddMedication && (
-          <StyledTouchableOpacity
-            className="bg-customBlue py-3 px-6 rounded-lg mt-4 shadow-md"
-            onPress={() => setShowAddMedication(true)}
-          >
-            <StyledText className="text-white text-lg font-bold text-center">
-              <StyledText className="text-xl font-bold mr-2">+</StyledText> Add
-              Medication
-            </StyledText>
-          </StyledTouchableOpacity>
-        )}
-
-        {/* Add Medication Form */}
-        {showAddMedication && (
-          <AddMedication onClose={() => setShowAddMedication(false)} />
-        )}
-
-        {/* Medication Items */}
-        {!showAddMedication && (
-          <>
-            <StyledText className="mt-4 text-lg font-bold text-black">
-              8:30
-            </StyledText>
-            <StyledView className="mt-2 w-full">
-              <StyledTouchableOpacity className="bg-customBlue py-3 px-4 rounded-lg mt-2 w-full flex-row items-center shadow-md">
-                <StyledTouchableOpacity
-                  className="w-7 h-7 rounded-md border border-black items-center justify-center mr-4"
-                  onPress={() =>
-                    toggleStatus(
-                      firstMedicationStatus,
-                      setFirstMedicationStatus
-                    )
-                  }
-                >
-                  <StyledText className="text-lg">
-                    {firstMedicationStatus === "tick"
-                      ? "✔️"
-                      : firstMedicationStatus === "cross"
-                      ? "❌"
-                      : ""}
-                  </StyledText>
-                </StyledTouchableOpacity>
-                <StyledText className="text-lg text-black">
-                  Paracetamol, 250 mg
-                </StyledText>
-              </StyledTouchableOpacity>
-
-              <StyledTouchableOpacity className="bg-customBlue py-3 px-4 rounded-lg mt-2 w-full flex-row items-center shadow-md">
-                <StyledTouchableOpacity
-                  className="w-7 h-7 rounded-md border border-black items-center justify-center mr-4"
-                  onPress={() =>
-                    toggleStatus(
-                      secondMedicationStatus,
-                      setSecondMedicationStatus
-                    )
-                  }
-                >
-                  <StyledText className="text-lg">
-                    {secondMedicationStatus === "tick"
-                      ? "✔️"
-                      : secondMedicationStatus === "cross"
-                      ? "❌"
-                      : ""}
-                  </StyledText>
-                </StyledTouchableOpacity>
-                <StyledText className="text-lg text-black">
-                  Losartan, 400 mg
-                </StyledText>
-              </StyledTouchableOpacity>
-            </StyledView>
-          </>
-        )}
-      </StyledView>
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -308,6 +313,16 @@ const AddMedication = ({ onClose }: { onClose: () => void }) => {
       >
         <StyledText className="text-white text-lg font-bold text-center">
           Save Medication
+        </StyledText>
+      </StyledTouchableOpacity>
+
+      {/* Cancel Button */}
+      <StyledTouchableOpacity
+        className="bg-gray-400 py-3 rounded-lg mt-2 shadow-md"
+        onPress={onClose} // Return to the MedTracking page
+      >
+        <StyledText className="text-white text-lg font-bold text-center">
+          Cancel
         </StyledText>
       </StyledTouchableOpacity>
     </StyledView>
