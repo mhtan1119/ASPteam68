@@ -39,10 +39,10 @@ const ProfileEditPage: React.FC = () => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [errors, setErrors] = useState({
-    fullName: '',
-    phoneNumber: '',
-    height: '',
-    weight: '',
+    fullName: "",
+    phoneNumber: "",
+    height: "",
+    weight: "",
   });
 
   useEffect(() => {
@@ -79,8 +79,6 @@ const ProfileEditPage: React.FC = () => {
     setShowDatePicker(false);
     setDateOfBirth(currentDate);
   };
-
-  
 
   const handleSave = async () => {
     validateFullName(fullName);
@@ -128,9 +126,9 @@ const ProfileEditPage: React.FC = () => {
   };
 
   const validateFullName = (fullName: string) => {
-    let error = '';
-    if (fullName.trim() === '') {
-      error = 'Full name is required.';
+    let error = "";
+    if (fullName.trim() === "") {
+      error = "Full name is required.";
     }
     setErrors((prevErrors) => ({
       ...prevErrors,
@@ -139,11 +137,11 @@ const ProfileEditPage: React.FC = () => {
   };
 
   const validatePhoneNumber = (phoneNumber: string) => {
-    let error = '';
+    let error = "";
     const phonePattern = /^[0-9]{8}$/;
 
     if (!phonePattern.test(phoneNumber)) {
-      error = 'Phone number must be exactly 8 digits.';
+      error = "Phone number must be exactly 8 digits.";
     }
     setErrors((prevErrors) => ({
       ...prevErrors,
@@ -160,7 +158,6 @@ const ProfileEditPage: React.FC = () => {
     setPhoneNumber(text);
     validatePhoneNumber(text);
   };
-
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -220,7 +217,9 @@ const ProfileEditPage: React.FC = () => {
               value={fullName}
               onChangeText={handleFullNameChange}
             />
-            {errors.fullName && <Text style={styles.errorText}>{errors.fullName}</Text>}
+            {errors.fullName && (
+              <Text style={styles.errorText}>{errors.fullName}</Text>
+            )}
           </View>
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Gender</Text>
@@ -272,24 +271,28 @@ const ProfileEditPage: React.FC = () => {
             <View style={styles.columnContainer}>
               <Text style={styles.label}>Height (cm)</Text>
               <TextInput
-                style={[styles.input,errors.height ? styles.errorInput : null]}
+                style={[styles.input, errors.height ? styles.errorInput : null]}
                 keyboardType="numeric"
                 placeholder="Enter height"
                 value={height}
                 onChangeText={setHeight}
               />
-               {errors.height && <Text style={styles.errorText}>{errors.height}</Text>}
+              {errors.height && (
+                <Text style={styles.errorText}>{errors.height}</Text>
+              )}
             </View>
             <View style={[styles.columnContainer, styles.columnSpacing]}>
               <Text style={styles.label}>Weight (kg)</Text>
               <TextInput
-                style={[styles.input,errors.weight ? styles.errorInput : null]}
+                style={[styles.input, errors.weight ? styles.errorInput : null]}
                 keyboardType="numeric"
                 placeholder="Enter weight"
                 value={weight}
                 onChangeText={setWeight}
               />
-               {errors.weight && <Text style={styles.errorText}>{errors.weight}</Text>}
+              {errors.weight && (
+                <Text style={styles.errorText}>{errors.weight}</Text>
+              )}
             </View>
           </View>
           <View style={styles.inputContainer}>
@@ -322,14 +325,19 @@ const ProfileEditPage: React.FC = () => {
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Phone Number</Text>
             <TextInput
-              style={[styles.input,errors.phoneNumber ? styles.errorInput : null]}
+              style={[
+                styles.input,
+                errors.phoneNumber ? styles.errorInput : null,
+              ]}
               placeholder="Enter your phone number"
               value={phoneNumber}
               onChangeText={handlePhoneNumberChange}
               keyboardType="phone-pad"
               maxLength={8}
             />
-            {errors.phoneNumber && <Text style={styles.errorText}>{errors.phoneNumber}</Text>}
+            {errors.phoneNumber && (
+              <Text style={styles.errorText}>{errors.phoneNumber}</Text>
+            )}
           </View>
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Address</Text>
@@ -514,13 +522,13 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   errorInput: {
-    borderColor: 'red', // Red border to indicate an error
+    borderColor: "red", // Red border to indicate an error
     borderWidth: 1, // Border width
   },
 
   // Style for error text
   errorText: {
-    color: 'red', // Red color for error text
+    color: "red", // Red color for error text
     fontSize: 12, // Font size
     marginTop: 4, // Margin to separate from the input field
   },

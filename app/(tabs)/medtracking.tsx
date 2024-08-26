@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   SafeAreaView,
@@ -7,18 +7,55 @@ import {
   TextInput,
   Platform,
   ScrollView,
+  Alert,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import moment from "moment";
 import { styled } from "nativewind";
+import {
+  SQLiteBindParams,
+  SQLiteProvider,
+  useSQLiteContext,
+} from "expo-sqlite";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "@react-navigation/native";
 
 const StyledView = styled(View);
 const StyledText = styled(Text);
 const StyledTouchableOpacity = styled(TouchableOpacity);
 const StyledTextInput = styled(TextInput);
 
+// Initialize the database
+const initializeDatabase = async (db: any) => {
+  try {
+    await db.execAsync(`
+      CREATE TABLE IF NOT EXISTS medications (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        dosageStrength TEXT,
+        unit TEXT,
+        dosageForm TEXT,
+        time TEXT,
+        date TEXT
+      );
+    `);
+    console.log("Database initialized!");
+  } catch (error) {
+    console.log("Error while initializing the database:", error);
+  }
+};
+
+export default function App() {
+  return (
+    <SQLiteProvider databaseName="medications.db" onInit={initializeDatabase}>
+      <MedTracking />
+    </SQLiteProvider>
+  );
+}
+
 const MedTracking = () => {
+  const db = useSQLiteContext();
   const daysOfWeek = [
     "Sunday",
     "Monday",
@@ -45,6 +82,30 @@ const MedTracking = () => {
   const [secondMedicationStatus, setSecondMedicationStatus] =
     useState<string>(""); // '', 'tick', 'cross'
   const [showAddMedication, setShowAddMedication] = useState(false); // To toggle add medication form visibility
+  interface Medication {
+    id: number;
+    name: string;
+    dosageStrength: string;
+    unit: string;
+    dosageForm: string;
+    time: string;
+    date: string; // Add date field here
+  }
+
+  const [medications, setMedications] = useState<Medication[]>([]); // State to store medications
+
+  useEffect(() => {
+    fetchMedications();
+  }, []);
+
+  const fetchMedications = () => {
+    try {
+      const result: Medication[] = db.getAllSync("SELECT * FROM medications;");
+      setMedications(result); // Assuming the result is an array of rows
+    } catch (error) {
+      console.log("Error fetching medications:", error);
+    }
+  };
 
   const handleDayPress = (index: number) => {
     setSelectedDayIndex(index);
@@ -60,6 +121,26 @@ const MedTracking = () => {
       setStatus("cross");
     } else {
       setStatus("");
+    }
+  };
+
+  const saveMedication = async (
+    name: string,
+    dosageStrength: string,
+    unit: string,
+    dosageForm: string,
+    time: string,
+    date: string // Add date as a parameter
+  ) => {
+    try {
+      await db.runAsync(
+        "INSERT INTO medications (name, dosageStrength, unit, dosageForm, time, date) VALUES (?, ?, ?, ?, ?, ?);",
+        [name, dosageStrength, unit, dosageForm, time, date] as SQLiteBindParams
+      );
+      Alert.alert("Success", "Medication saved successfully.");
+      fetchMedications(); // Fetch updated medications list
+    } catch (error) {
+      console.log("Error saving medication:", error);
     }
   };
 
@@ -99,71 +180,57 @@ const MedTracking = () => {
               onPress={() => setShowAddMedication(true)}
             >
               <StyledText className="text-white text-lg font-bold text-center">
-                <StyledText className="text-xl font-bold mr-2">+</StyledText>{" "}
-                Add Medication
+                <StyledText className="text-xl font-bold mr-2">+</StyledText>
+                {" Add Medication"}
               </StyledText>
             </StyledTouchableOpacity>
           )}
-
           {/* Add Medication Form */}
           {showAddMedication && (
-            <AddMedication onClose={() => setShowAddMedication(false)} />
+            <AddMedication
+              onClose={() => setShowAddMedication(false)}
+              onSave={(name, dosageStrength, unit, dosageForm, time) =>
+                saveMedication(
+                  name,
+                  dosageStrength,
+                  unit,
+                  dosageForm,
+                  time,
+                  orderedDays[selectedDayIndex]
+                )
+              }
+            />
           )}
 
           {/* Medication Items */}
           {!showAddMedication && (
-            <>
-              <StyledText className="mt-4 text-lg font-bold text-black">
-                8:30
-              </StyledText>
-              <StyledView className="mt-2 w-full">
-                <StyledTouchableOpacity className="bg-customBlue py-3 px-4 rounded-lg mt-2 w-full flex-row items-center shadow-md">
-                  <StyledTouchableOpacity
-                    className="w-7 h-7 rounded-md border border-black items-center justify-center mr-4"
-                    onPress={() =>
-                      toggleStatus(
-                        firstMedicationStatus,
-                        setFirstMedicationStatus
-                      )
-                    }
+            <StyledView className="mt-8 w-full">
+              {medications.length > 0 ? (
+                medications.map((medication) => (
+                  <StyledView
+                    key={medication.id}
+                    className="mb-4 p-4 border rounded-lg bg-gray-100"
                   >
-                    <StyledText className="text-lg">
-                      {firstMedicationStatus === "tick"
-                        ? "✔️"
-                        : firstMedicationStatus === "cross"
-                        ? "❌"
-                        : ""}
+                    <StyledText className="text-lg font-bold">
+                      {medication.name}
                     </StyledText>
-                  </StyledTouchableOpacity>
-                  <StyledText className="text-lg text-black">
-                    Paracetamol, 250 mg
-                  </StyledText>
-                </StyledTouchableOpacity>
-
-                <StyledTouchableOpacity className="bg-customBlue py-3 px-4 rounded-lg mt-2 w-full flex-row items-center shadow-md">
-                  <StyledTouchableOpacity
-                    className="w-7 h-7 rounded-md border border-black items-center justify-center mr-4"
-                    onPress={() =>
-                      toggleStatus(
-                        secondMedicationStatus,
-                        setSecondMedicationStatus
-                      )
-                    }
-                  >
-                    <StyledText className="text-lg">
-                      {secondMedicationStatus === "tick"
-                        ? "✔️"
-                        : secondMedicationStatus === "cross"
-                        ? "❌"
-                        : ""}
+                    <StyledText>
+                      {`${medication.dosageStrength} ${medication.unit} - ${medication.dosageForm}`}
                     </StyledText>
-                  </StyledTouchableOpacity>
-                  <StyledText className="text-lg text-black">
-                    Losartan, 400 mg
-                  </StyledText>
-                </StyledTouchableOpacity>
-              </StyledView>
-            </>
+                    <StyledText className="text-gray-600">
+                      {`Time: ${medication.time}`}
+                    </StyledText>
+                    <StyledText className="text-gray-600">
+                      {`Date: ${medication.date}`}
+                    </StyledText>
+                  </StyledView>
+                ))
+              ) : (
+                <StyledText className="text-center text-gray-500">
+                  No medications added.
+                </StyledText>
+              )}
+            </StyledView>
           )}
         </StyledView>
       </ScrollView>
@@ -171,7 +238,19 @@ const MedTracking = () => {
   );
 };
 
-const AddMedication = ({ onClose }: { onClose: () => void }) => {
+const AddMedication = ({
+  onClose,
+  onSave,
+}: {
+  onClose: () => void;
+  onSave: (
+    name: string,
+    dosageStrength: string,
+    unit: string,
+    dosageForm: string,
+    time: string
+  ) => Promise<void>;
+}) => {
   const [medicationName, setMedicationName] = useState("");
   const [dosageStrength, setDosageStrength] = useState("");
   const [unit, setUnit] = useState("mg");
@@ -200,6 +279,11 @@ const AddMedication = ({ onClose }: { onClose: () => void }) => {
 
   const confirmTime = () => {
     setShowTimePicker(false); // Close the picker when user confirms
+  };
+
+  const handleSaveMedication = () => {
+    onSave(medicationName, dosageStrength, unit, dosageForm, formatTime(time));
+    onClose();
   };
 
   return (
@@ -306,10 +390,7 @@ const AddMedication = ({ onClose }: { onClose: () => void }) => {
 
       <StyledTouchableOpacity
         className="bg-customBlue py-3 rounded-lg mt-4 shadow-md"
-        onPress={() => {
-          // Handle saving the medication
-          onClose(); // Close the form
-        }}
+        onPress={handleSaveMedication}
       >
         <StyledText className="text-white text-lg font-bold text-center">
           Save Medication
@@ -328,5 +409,3 @@ const AddMedication = ({ onClose }: { onClose: () => void }) => {
     </StyledView>
   );
 };
-
-export default MedTracking;
