@@ -314,6 +314,11 @@ const AddMedication = ({
   };
 
   const handleSaveMedication = () => {
+    if (!medicationName || !dosageStrength || !unit || !dosageForm || !time) {
+      Alert.alert("Validation Error", "Please fill in all the fields.");
+      return;
+    }
+
     onSave(medicationName, dosageStrength, unit, dosageForm, formatTime(time));
     onClose();
   };
