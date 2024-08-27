@@ -41,16 +41,16 @@ const StyledView = styled(View);
 // Initialize the database
 const initializeDatabase = async (db: any) => {
   try {
-    await db.execAsync(`
-      CREATE TABLE IF NOT EXISTS appointments (
+    await db.execAsync(
+      `CREATE TABLE IF NOT EXISTS appointments (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         service TEXT,
         location TEXT,
         date TEXT,
         time TEXT,
         remarks TEXT
-      );
-    `);
+      );`
+    );
     console.log("Database initialized!");
   } catch (error) {
     console.log("Error while initializing the database:", error);
@@ -60,12 +60,22 @@ const initializeDatabase = async (db: any) => {
 export default function App() {
   return (
     <SQLiteProvider databaseName="data.db" onInit={initializeDatabase}>
-      <Booking />
+      <Main />
     </SQLiteProvider>
   );
 }
 
-function Booking() {
+function Main() {
+  const [showBookedAppointments, setShowBookedAppointments] = useState(true);
+
+  return showBookedAppointments ? (
+    <BookedAppointments onClose={() => setShowBookedAppointments(false)} />
+  ) : (
+    <Booking onBack={() => setShowBookedAppointments(true)} />
+  );
+}
+
+function Booking({ onBack }: { onBack: any }) {
   const db = useSQLiteContext();
   const router = useRouter();
   const {
@@ -215,12 +225,17 @@ function Booking() {
       return;
     }
 
-    const formattedDate = date.toISOString().split("T")[0];
+    // Normalize the date to avoid time zone issues
+    const normalizedDate = new Date(
+      date.getTime() - date.getTimezoneOffset() * 60000
+    )
+      .toISOString()
+      .split("T")[0];
 
     try {
       await db.runAsync(
         "INSERT INTO appointments (service, location, date, time, remarks) VALUES (?, ?, ?, ?, ?);",
-        [service, location, formattedDate, time, remarks] as SQLiteBindParams
+        [service, location, normalizedDate, time, remarks] as SQLiteBindParams
       );
       Alert.alert("Success", "Appointment saved successfully.");
     } catch (error) {
@@ -428,8 +443,117 @@ function Booking() {
           </StyledText>
         </StyledTouchableOpacity>
 
+        <StyledTouchableOpacity
+          className="bg-gray-400 py-2 rounded mt-5"
+          onPress={onBack}
+        >
+          <StyledText className="text-white text-center text-lg">
+            Back to Booked Appointments
+          </StyledText>
+        </StyledTouchableOpacity>
+
         <StyledView className="h-12" />
       </StyledScrollView>
     </StyledSafeAreaView>
   );
 }
+const BookedAppointments = ({ onClose }: { onClose: any }) => {
+  const db = useSQLiteContext();
+  const [appointments, setAppointments] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetchAppointments();
+  }, []);
+
+  const fetchAppointments = async () => {
+    try {
+      const result = await db.getAllSync(
+        `SELECT * FROM appointments 
+        ORDER BY date(date) ASC, time(time) ASC;`
+      );
+      setAppointments(result);
+    } catch (error) {
+      console.log("Error fetching appointments:", error);
+    }
+  };
+
+  const deleteAppointment = async (id: number) => {
+    try {
+      await db.runAsync("DELETE FROM appointments WHERE id = ?;", [id]);
+      Alert.alert("Success", "Appointment deleted successfully.");
+      fetchAppointments(); // Refresh the list after deletion
+    } catch (error) {
+      console.log("Error deleting appointment:", error);
+    }
+  };
+
+  const confirmDeleteAppointment = (id: number) => {
+    Alert.alert(
+      "Confirm Deletion",
+      "Are you sure you want to delete this appointment?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => deleteAppointment(id),
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
+  return (
+    <StyledSafeAreaView className="flex-1 bg-gray-100">
+      <StyledScrollView className="p-5">
+        <StyledText className="text-2xl font-bold mb-5 text-center bg-customBlue2 text-white py-3 rounded">
+          Booked Appointments
+        </StyledText>
+
+        {appointments.length > 0 ? (
+          appointments.map((appointment, index) => (
+            <StyledView
+              key={index}
+              className="mb-4 p-4 border rounded-lg bg-customBlue relative"
+            >
+              {/* X button to delete the appointment with confirmation */}
+              <TouchableOpacity
+                className="absolute top-2 right-2"
+                onPress={() => confirmDeleteAppointment(appointment.id)}
+              >
+                <StyledText className="text-white text-lg">✖️</StyledText>
+              </TouchableOpacity>
+
+              <StyledText className="font-bold mb-2">
+                Service: {appointment.service}
+              </StyledText>
+              <StyledText className="mb-2">
+                Location: {appointment.location}
+              </StyledText>
+              <StyledText className="mb-2">Date: {appointment.date}</StyledText>
+              <StyledText className="mb-2">Time: {appointment.time}</StyledText>
+              <StyledText className="mb-2">
+                Remarks: {appointment.remarks}
+              </StyledText>
+            </StyledView>
+          ))
+        ) : (
+          <StyledText className="text-center text-gray-500">
+            No booked appointments found.
+          </StyledText>
+        )}
+
+        <StyledTouchableOpacity
+          className="bg-customBlue py-2 rounded mt-5"
+          onPress={onClose}
+        >
+          <StyledText className="text-white text-center text-lg">
+            Make a New Appointment
+          </StyledText>
+        </StyledTouchableOpacity>
+
+        <StyledView className="h-12" />
+      </StyledScrollView>
+    </StyledSafeAreaView>
+  );
+};

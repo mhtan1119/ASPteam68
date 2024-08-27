@@ -83,6 +83,8 @@ const UserListScreen: React.FC = () => {
 
       if (appointmentList.length > 0) {
         setNextAppointment(appointmentList[0]);
+      } else {
+        setNextAppointment(null); // Clear the appointment if no future appointments are found
       }
     } catch (error) {
       console.log("Error fetching appointments:", error);

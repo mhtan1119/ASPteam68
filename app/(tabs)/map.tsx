@@ -161,14 +161,13 @@ export default function MapScreen() {
     setModalVisible(false);
     setSelectedLocation(null);
   };
-
   const handleBookAppointment = (locationName: string) => {
     closeModal();
     router.push({
-      pathname: "/booking",
+      pathname: "/booking", // Path to your booking page
       params: {
         locationName,
-        clearForm: "true", // Add this parameter to signal clearing the form
+        clearForm: "true", // Ensures the form is cleared before the new appointment is made
       },
     });
   };
