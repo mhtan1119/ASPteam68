@@ -48,7 +48,7 @@ const initializeDatabase = async (db: any) => {
 
 export default function App() {
   return (
-    <SQLiteProvider databaseName="medications.db" onInit={initializeDatabase}>
+    <SQLiteProvider databaseName="data.db" onInit={initializeDatabase}>
       <MedTracking />
     </SQLiteProvider>
   );

@@ -59,7 +59,7 @@ const initializeDatabase = async (db: any) => {
 
 export default function App() {
   return (
-    <SQLiteProvider databaseName="appointment11.db" onInit={initializeDatabase}>
+    <SQLiteProvider databaseName="data.db" onInit={initializeDatabase}>
       <Booking />
     </SQLiteProvider>
   );

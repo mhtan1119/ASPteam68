@@ -10,9 +10,11 @@ import { styled } from "nativewind";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StatusBar } from "expo-status-bar";
 import Checkbox from "expo-checkbox";
+import moment from "moment";
 
 type RootStackParamList = {
   booking: undefined; // Add more routes as needed
+  medtracking: undefined;
 };
 
 const StyledView = styled(View);
@@ -31,6 +33,15 @@ const UserListScreen: React.FC = () => {
   } | null>(null);
   const [isVisible, setIsVisible] = useState(true);
   const [modalVisible, setModalVisible] = useState(false); // For showing the pop-up
+  const [medications, setMedications] = useState<
+    {
+      name: string;
+      dosageStrength: number;
+      unit: string;
+      dosageForm: string;
+      time: string;
+    }[]
+  >([]); // Store today's medications
 
   const [userProfile, setUserProfile] = useState<{
     age: number;
@@ -60,6 +71,25 @@ const UserListScreen: React.FC = () => {
       }
     } catch (error) {
       console.log("Error fetching appointments:", error);
+    }
+  };
+
+  const fetchTodaysMedications = async () => {
+    try {
+      const today = moment().format("dddd"); // Get the day in text format (e.g., "Monday")
+      const result: {
+        name: string;
+        dosageStrength: number;
+        unit: string;
+        dosageForm: string;
+        time: string;
+      }[] = await db.getAllAsync(
+        "SELECT name, dosageStrength, unit, dosageForm, time FROM medications WHERE date = ?;",
+        [today]
+      );
+      setMedications(result);
+    } catch (error) {
+      console.log("Error fetching today's medications:", error);
     }
   };
 
@@ -99,6 +129,7 @@ const UserListScreen: React.FC = () => {
   useFocusEffect(
     useCallback(() => {
       fetchAppointments();
+      fetchTodaysMedications(); // Fetch today's medications whenever the screen is focused
       fetchUserProfile();
     }, [])
   );
@@ -205,21 +236,21 @@ const UserListScreen: React.FC = () => {
           </Text>
         </StyledView>
         <StyledView className="flex-row ml-16 my-8">
-          <StyledView className="space-y-5">
-            <Checkbox className="mr-2" value={false} onValueChange={() => {}} />
-            <Checkbox className="" value={false} onValueChange={() => {}} />
-            <Checkbox className="" value={false} onValueChange={() => {}} />
-          </StyledView>
-          <StyledView className="grow space-y-4">
-            <Text className="text-sm">Paracetamol, 500mg</Text>
-            <Text className="text-sm">Ibuprofen, 400mg</Text>
-            <Text className="text-sm">Metformin, 500mg</Text>
-          </StyledView>
-          <StyledView className="mr-16 space-y-4">
-            <Text className="text-sm">08:00 AM</Text>
-            <Text className="text-sm">08:00 AM</Text>
-            <Text className="text-sm">07:30 PM</Text>
-          </StyledView>
+          {medications.map((medication, index) => (
+            <StyledView className="flex-row mb-4" key={index}>
+              <Checkbox
+                className="mr-2"
+                value={false}
+                onValueChange={() => {}}
+              />
+              <StyledView className="grow">
+                <Text className="text-sm">{`${medication.name}, ${medication.dosageStrength}${medication.unit}`}</Text>
+              </StyledView>
+              <StyledView className="mr-16">
+                <Text className="text-sm">{medication.time}</Text>
+              </StyledView>
+            </StyledView>
+          ))}
         </StyledView>
         <StyledView className="border-y-2 bg-customBlue">
           <Text className="ml-4 my-4 text-3xl font-bold">
@@ -245,7 +276,7 @@ const UserListScreen: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <SQLiteProvider databaseName="appointment11.db">
+    <SQLiteProvider databaseName="data.db">
       <UserListScreen />
     </SQLiteProvider>
   );

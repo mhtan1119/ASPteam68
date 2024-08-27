@@ -47,7 +47,7 @@ export default function Login() {
   };
 
   return (
-    <SQLiteProvider databaseName="auth.db" onInit={initializeDatabase}>
+    <SQLiteProvider databaseName="data.db" onInit={initializeDatabase}>
       {currentScreen === "Login" && <LoginScreen navigate={handleNavigation} />}
       {currentScreen === "Register" && (
         <RegisterScreen navigate={handleNavigation} />
