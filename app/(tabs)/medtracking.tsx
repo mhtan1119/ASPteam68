@@ -8,6 +8,7 @@ import {
   Platform,
   ScrollView,
   Alert,
+  Modal,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -352,7 +353,7 @@ const AddMedication = ({
   };
 
   const confirmTime = () => {
-    setShowTimePicker(false); // Close the picker when user confirms
+    setShowTimePicker(false); // Close the picker when the user confirms
   };
 
   const handleSaveMedication = () => {
@@ -449,22 +450,42 @@ const AddMedication = ({
         </StyledText>
       </StyledTouchableOpacity>
 
-      {showTimePicker && (
+      {showTimePicker && Platform.OS === "ios" && (
+        <Modal
+          transparent={true}
+          animationType="slide"
+          visible={showTimePicker}
+          onRequestClose={confirmTime}
+        >
+          <StyledView className="flex-1 justify-center items-center bg-black bg-opacity-75">
+            <StyledView className="bg-white p-6 rounded-lg shadow-lg w-4/5">
+              <DateTimePicker
+                value={time}
+                mode="time"
+                display="spinner"
+                onChange={onTimeChange}
+                textColor="black" // Ensures the text is black and visible
+              />
+              <StyledTouchableOpacity
+                className="mt-4 bg-customBlue py-2 rounded-lg"
+                onPress={confirmTime}
+              >
+                <StyledText className="text-white text-center">
+                  Confirm
+                </StyledText>
+              </StyledTouchableOpacity>
+            </StyledView>
+          </StyledView>
+        </Modal>
+      )}
+
+      {Platform.OS !== "ios" && showTimePicker && (
         <DateTimePicker
           value={time}
           mode="time"
-          display={Platform.OS === "ios" ? "spinner" : "default"}
+          display="default"
           onChange={onTimeChange}
         />
-      )}
-
-      {Platform.OS === "ios" && showTimePicker && (
-        <StyledTouchableOpacity
-          className="h-10 bg-customBlue rounded justify-center items-center mb-4"
-          onPress={confirmTime}
-        >
-          <StyledText className="text-white text-lg">Confirm</StyledText>
-        </StyledTouchableOpacity>
       )}
 
       <StyledTouchableOpacity
@@ -479,7 +500,7 @@ const AddMedication = ({
       {/* Cancel Button */}
       <StyledTouchableOpacity
         className="bg-gray-400 py-3 rounded-lg mt-2 shadow-md"
-        onPress={onClose} // Return to the MedTracking page
+        onPress={onClose}
       >
         <StyledText className="text-white text-lg font-bold text-center">
           Cancel
