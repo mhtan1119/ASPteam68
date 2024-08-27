@@ -106,7 +106,7 @@ const MedTracking = () => {
   const fetchMedications = () => {
     try {
       const result: Medication[] = db.getAllSync(
-        "SELECT * FROM medications WHERE date = ?;",
+        "SELECT * FROM medications WHERE date = ? ORDER BY time ASC;",
         [orderedDays[selectedDayIndex]]
       );
       setMedications(result); // Assuming the result is an array of rows

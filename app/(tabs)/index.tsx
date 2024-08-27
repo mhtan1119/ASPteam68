@@ -101,7 +101,7 @@ const UserListScreen: React.FC = () => {
         time: string;
         status: string;
       }[] = await db.getAllAsync(
-        "SELECT id, name, dosageStrength, unit, dosageForm, time, status FROM medications WHERE date = ?;",
+        "SELECT id, name, dosageStrength, unit, dosageForm, time, status FROM medications WHERE date = ? ORDER BY time ASC;",
         [today]
       );
       setMedications(result);
@@ -109,7 +109,6 @@ const UserListScreen: React.FC = () => {
       console.log("Error fetching today's medications:", error);
     }
   };
-
   const fetchRecentlyTakenPills = async () => {
     try {
       const result: {
@@ -122,7 +121,7 @@ const UserListScreen: React.FC = () => {
         date: string;
         status: string;
       }[] = await db.getAllAsync(
-        "SELECT id, name, dosageStrength, unit, dosageForm, time, date, status FROM medications WHERE status = 'tick';"
+        "SELECT id, name, dosageStrength, unit, dosageForm, time, date, status FROM medications WHERE status = 'tick' ORDER BY time ASC;"
       );
       setRecentlyTakenPills(result);
     } catch (error) {
