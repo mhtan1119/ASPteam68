@@ -37,7 +37,8 @@ const initializeDatabase = async (db: any) => {
         unit TEXT,
         dosageForm TEXT,
         time TEXT,
-        date TEXT
+        date TEXT,
+        status TEXT DEFAULT ''
       );
     `);
     console.log("Database initialized!");
@@ -90,18 +91,30 @@ const MedTracking = () => {
     dosageForm: string;
     time: string;
     date: string;
+    status: string; // New status field
   }
 
   const [medications, setMedications] = useState<Medication[]>([]);
 
+  // Fetch medications whenever selectedDayIndex changes
   useEffect(() => {
     fetchMedications();
-  }, []);
+  }, [selectedDayIndex]);
 
   const fetchMedications = () => {
     try {
-      const result: Medication[] = db.getAllSync("SELECT * FROM medications;");
+      const result: Medication[] = db.getAllSync(
+        "SELECT * FROM medications WHERE date = ?;",
+        [orderedDays[selectedDayIndex]]
+      );
       setMedications(result); // Assuming the result is an array of rows
+
+      // Initialize statuses
+      const initialStatuses: Record<number, string> = {};
+      result.forEach((medication) => {
+        initialStatuses[medication.id] = medication.status;
+      });
+      setMedicationStatuses(initialStatuses);
     } catch (error) {
       console.log("Error fetching medications:", error);
     }
@@ -157,6 +170,20 @@ const MedTracking = () => {
           : "tick";
       return { ...prevStatuses, [id]: newStatus };
     });
+  };
+
+  const saveStatuses = async () => {
+    try {
+      for (const [id, status] of Object.entries(medicationStatuses)) {
+        await db.runAsync("UPDATE medications SET status = ? WHERE id = ?;", [
+          status,
+          id,
+        ]);
+      }
+      Alert.alert("Success", "Medication statuses saved successfully.");
+    } catch (error) {
+      console.log("Error saving statuses:", error);
+    }
   };
 
   return (
@@ -263,6 +290,18 @@ const MedTracking = () => {
                 </StyledText>
               )}
             </StyledView>
+          )}
+
+          {/* Save Button */}
+          {!showAddMedication && (
+            <StyledTouchableOpacity
+              className="bg-customBlue py-3 px-6 rounded-lg mt-4 shadow-md"
+              onPress={saveStatuses}
+            >
+              <StyledText className="text-white text-lg font-bold text-center">
+                Save Statuses
+              </StyledText>
+            </StyledTouchableOpacity>
           )}
         </StyledView>
       </ScrollView>

@@ -35,11 +35,13 @@ const UserListScreen: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false); // For showing the pop-up
   const [medications, setMedications] = useState<
     {
+      id: number;
       name: string;
       dosageStrength: number;
       unit: string;
       dosageForm: string;
       time: string;
+      status: string; // New status field
     }[]
   >([]); // Store today's medications
 
@@ -78,13 +80,15 @@ const UserListScreen: React.FC = () => {
     try {
       const today = moment().format("dddd"); // Get the day in text format (e.g., "Monday")
       const result: {
+        id: number;
         name: string;
         dosageStrength: number;
         unit: string;
         dosageForm: string;
         time: string;
+        status: string;
       }[] = await db.getAllAsync(
-        "SELECT name, dosageStrength, unit, dosageForm, time FROM medications WHERE date = ?;",
+        "SELECT id, name, dosageStrength, unit, dosageForm, time, status FROM medications WHERE date = ?;",
         [today]
       );
       setMedications(result);
@@ -238,11 +242,16 @@ const UserListScreen: React.FC = () => {
         <StyledView className="ml-16 my-8 space-y-4">
           {medications.map((medication, index) => (
             <StyledView className="flex-row items-center" key={index}>
-              <Checkbox
-                className="mr-2"
-                value={false}
-                onValueChange={() => {}}
-              />
+              {medication.status === "cross" ? (
+                <Text className="text-red-600 text-xl mr-2">⚠️</Text>
+              ) : (
+                <Checkbox
+                  className="mr-2"
+                  value={medication.status === "tick"}
+                  onValueChange={() => {}} // Disabled onValueChange to make it uneditable
+                  disabled={true} // Disables the checkbox to make it uneditable
+                />
+              )}
               <StyledView className="grow">
                 <Text className="text-sm font-bold">{medication.name}</Text>
                 <Text className="text-sm">
