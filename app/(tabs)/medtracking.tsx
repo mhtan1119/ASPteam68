@@ -209,6 +209,7 @@ const MedTracking = () => {
                   index === selectedDayIndex ? "bg-customBlue" : "bg-black"
                 }`}
                 onPress={() => handleDayPress(index)}
+                style={{ marginHorizontal: 3 }} // Add horizontal margin to increase spacing
               >
                 <StyledText className="text-white">
                   {day.slice(0, 3)}
