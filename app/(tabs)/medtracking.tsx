@@ -70,11 +70,13 @@ const MedTracking = () => {
   const currentDayIndex = today.getDay();
 
   const orderedDays = [
-    daysOfWeek[(currentDayIndex + 6) % 7],
     daysOfWeek[(currentDayIndex + 5) % 7],
+    daysOfWeek[(currentDayIndex + 6) % 7],
     daysOfWeek[currentDayIndex], // Current day (middle day)
     daysOfWeek[(currentDayIndex + 1) % 7],
     daysOfWeek[(currentDayIndex + 2) % 7],
+    daysOfWeek[(currentDayIndex + 3) % 7],
+    daysOfWeek[(currentDayIndex + 4) % 7],
   ];
 
   const [selectedDayIndex, setSelectedDayIndex] = useState<number>(2); // Start with the middle day selected
