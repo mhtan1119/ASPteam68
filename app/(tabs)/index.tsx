@@ -235,16 +235,19 @@ const UserListScreen: React.FC = () => {
             Today's Medication
           </Text>
         </StyledView>
-        <StyledView className="flex-row ml-16 my-8">
+        <StyledView className="ml-16 my-8 space-y-4">
           {medications.map((medication, index) => (
-            <StyledView className="flex-row mb-4" key={index}>
+            <StyledView className="flex-row items-center" key={index}>
               <Checkbox
                 className="mr-2"
                 value={false}
                 onValueChange={() => {}}
               />
               <StyledView className="grow">
-                <Text className="text-sm">{`${medication.name}, ${medication.dosageStrength}${medication.unit}`}</Text>
+                <Text className="text-sm font-bold">{medication.name}</Text>
+                <Text className="text-sm">
+                  {`${medication.dosageStrength}${medication.unit} - ${medication.dosageForm}`}
+                </Text>
               </StyledView>
               <StyledView className="mr-16">
                 <Text className="text-sm">{medication.time}</Text>
@@ -252,6 +255,7 @@ const UserListScreen: React.FC = () => {
             </StyledView>
           ))}
         </StyledView>
+
         <StyledView className="border-y-2 bg-customBlue">
           <Text className="ml-4 my-4 text-3xl font-bold">
             Recently Taken Pills
