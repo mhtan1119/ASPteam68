@@ -45,6 +45,19 @@ const UserListScreen: React.FC = () => {
     }[]
   >([]); // Store today's medications
 
+  const [recentlyTakenPills, setRecentlyTakenPills] = useState<
+    {
+      id: number;
+      name: string;
+      dosageStrength: number;
+      unit: string;
+      dosageForm: string;
+      time: string;
+      date: string;
+      status: string; // New status field
+    }[]
+  >([]); // Store the recently taken pills that are ticked
+
   const [userProfile, setUserProfile] = useState<{
     age: number;
     allergies: string;
@@ -97,6 +110,26 @@ const UserListScreen: React.FC = () => {
     }
   };
 
+  const fetchRecentlyTakenPills = async () => {
+    try {
+      const result: {
+        id: number;
+        name: string;
+        dosageStrength: number;
+        unit: string;
+        dosageForm: string;
+        time: string;
+        date: string;
+        status: string;
+      }[] = await db.getAllAsync(
+        "SELECT id, name, dosageStrength, unit, dosageForm, time, date, status FROM medications WHERE status = 'tick';"
+      );
+      setRecentlyTakenPills(result);
+    } catch (error) {
+      console.log("Error fetching recently taken pills:", error);
+    }
+  };
+
   const calculateAge = (dob: Date) => {
     const today = new Date();
     const birthDate = new Date(dob);
@@ -130,10 +163,36 @@ const UserListScreen: React.FC = () => {
     }
   };
 
+  const toggleMedicationStatus = async (id: number, currentStatus: string) => {
+    const newStatus =
+      currentStatus === "tick"
+        ? "cross"
+        : currentStatus === "cross"
+        ? ""
+        : "tick";
+    try {
+      await db.runAsync("UPDATE medications SET status = ? WHERE id = ?;", [
+        newStatus,
+        id,
+      ]);
+      // Update the local state
+      setMedications((prevMedications) =>
+        prevMedications.map((medication) =>
+          medication.id === id
+            ? { ...medication, status: newStatus }
+            : medication
+        )
+      );
+    } catch (error) {
+      console.log("Error updating medication status:", error);
+    }
+  };
+
   useFocusEffect(
     useCallback(() => {
       fetchAppointments();
       fetchTodaysMedications(); // Fetch today's medications whenever the screen is focused
+      fetchRecentlyTakenPills(); // Fetch recently taken pills that are ticked
       fetchUserProfile();
     }, [])
   );
@@ -270,16 +329,19 @@ const UserListScreen: React.FC = () => {
             Recently Taken Pills
           </Text>
         </StyledView>
-        <StyledView className="flex-row ml-8 mt-10">
+        <StyledView className="flex-row ml-12 mt-10">
           <StyledView className="grow space-y-4">
-            <Text className="text-sm">Paracetamol, 500mg</Text>
-            <Text className="text-sm">Lisinopril, 10mg</Text>
-            <Text className="text-sm">Metformin, 500mg</Text>
-          </StyledView>
-          <StyledView className="mr-8 space-y-4">
-            <Text className="text-sm">07/12/24 08:12 AM</Text>
-            <Text className="text-sm">06/12/24 10:24 PM</Text>
-            <Text className="text-sm">06/12/24 07:36 PM</Text>
+            {recentlyTakenPills.map((pill, index) => (
+              <StyledView key={index} className="flex-row justify-between">
+                <Text className="text-sm">
+                  {pill.name}, {pill.dosageStrength}
+                  {pill.unit} - {pill.dosageForm}
+                </Text>
+                <Text className="text-sm mr-12 text-right">
+                  {pill.date} {pill.time}
+                </Text>
+              </StyledView>
+            ))}
           </StyledView>
         </StyledView>
       </ScrollView>
