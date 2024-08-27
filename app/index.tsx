@@ -6,6 +6,8 @@ import {
   Pressable,
   Alert,
   TouchableOpacity,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { Checkbox } from "react-native-paper";
@@ -122,66 +124,70 @@ const LoginScreen: React.FC<{
   };
 
   return (
-    <View className="flex-1 justify-center p-4 bg-white items-center mt-[-50px]">
-      <Text className="text-[#3F5F90] text-2xl font-bold mb-6">Login</Text>
-      <View className="w-4/5 my-1">
-        <Text className="font-bold text-lg mb-1">Email</Text>
-        <TextInput
-          className="p-2 border border-gray-300 rounded"
-          placeholder="Enter your email"
-          value={userName}
-          onChangeText={setUserName}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-      </View>
-      <View className="w-4/5 my-1">
-        <Text className="font-bold text-lg mb-1">Password</Text>
-        <View className="flex-row items-center border border-gray-300 rounded px-2">
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View className="flex-1 justify-center p-4 bg-white items-center mt-[-50px]">
+        <Text className="text-[#3F5F90] text-2xl font-bold mb-6">Login</Text>
+        <View className="w-4/5 my-1">
+          <Text className="font-bold text-lg mb-1">Email</Text>
           <TextInput
-            className="flex-1 py-2"
-            placeholder="Enter your password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry={!showPassword}
+            className="p-2 border border-gray-300 rounded"
+            placeholder="Enter your email"
+            value={userName}
+            onChangeText={setUserName}
+            keyboardType="email-address"
+            autoCapitalize="none"
           />
-          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-            <Icon
-              name={showPassword ? "visibility" : "visibility-off"}
-              size={24}
-              color="#000"
+        </View>
+        <View className="w-4/5 my-1">
+          <Text className="font-bold text-lg mb-1">Password</Text>
+          <View className="flex-row items-center border border-gray-300 rounded px-2">
+            <TextInput
+              className="flex-1 py-2"
+              placeholder="Enter your password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!showPassword}
             />
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+              <Icon
+                name={showPassword ? "visibility" : "visibility-off"}
+                size={24}
+                color="#000"
+              />
+            </TouchableOpacity>
+          </View>
+          {passwordError ? (
+            <Text className="text-red-500 text-sm mt-2">{`* ${passwordError}`}</Text>
+          ) : null}
+        </View>
+        <View className="w-4/5 flex-row justify-between items-center">
+          <View className="flex-row items-center">
+            <Checkbox
+              status={rememberMe ? "checked" : "unchecked"}
+              onPress={() => setRememberMe(!rememberMe)}
+            />
+            <Text className="text-sm ml-2">Remember Me</Text>
+          </View>
+          <TouchableOpacity onPress={handleForgotPassword}>
+            <Text className="text-[#007BFF] text-sm">Forgot Password?</Text>
           </TouchableOpacity>
         </View>
-        {passwordError ? (
-          <Text className="text-red-500 text-sm mt-2">{`* ${passwordError}`}</Text>
-        ) : null}
-      </View>
-      <View className="w-4/5 flex-row justify-between items-center">
-        <View className="flex-row items-center">
-          <Checkbox
-            status={rememberMe ? "checked" : "unchecked"}
-            onPress={() => setRememberMe(!rememberMe)}
-          />
-          <Text className="text-sm ml-2">Remember Me</Text>
-        </View>
-        <TouchableOpacity onPress={handleForgotPassword}>
-          <Text className="text-[#007BFF] text-sm">Forgot Password?</Text>
-        </TouchableOpacity>
-      </View>
-      <Pressable
-        className="w-4/5 p-3 bg-customBlue2 rounded mt-3 items-center"
-        onPress={handleLogin}
-      >
-        <Text className="text-white text-lg font-bold">Login</Text>
-      </Pressable>
-      <View className="flex-row mt-5">
-        <Text className="text-base text-gray-500">Don't have an account?</Text>
-        <Pressable className="ml-2" onPress={() => navigate("Register")}>
-          <Text className="text-[#007BFF] text-base font-bold">Sign Up</Text>
+        <Pressable
+          className="w-4/5 p-3 bg-customBlue2 rounded mt-3 items-center"
+          onPress={handleLogin}
+        >
+          <Text className="text-white text-lg font-bold">Login</Text>
         </Pressable>
+        <View className="flex-row mt-5">
+          <Text className="text-base text-gray-500">
+            Don't have an account?
+          </Text>
+          <Pressable className="ml-2" onPress={() => navigate("Register")}>
+            <Text className="text-[#007BFF] text-base font-bold">Sign Up</Text>
+          </Pressable>
+        </View>
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -247,80 +253,82 @@ const RegisterScreen: React.FC<{
   };
 
   return (
-    <View className="flex-1 justify-center p-4 bg-white items-center mt-[-50px]">
-      <Text className="text-[#3F5F90] text-2xl font-bold mb-6">Sign Up</Text>
-      <View className="w-4/5 my-1">
-        <Text className="font-bold text-lg mb-1">Email</Text>
-        <TextInput
-          className="p-2 border border-gray-300 rounded"
-          placeholder="Enter your email"
-          value={userName}
-          onChangeText={setUserName}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-      </View>
-      <View className="w-4/5 my-1">
-        <Text className="font-bold text-lg mb-1">Password</Text>
-        <View className="flex-row items-center border border-gray-300 rounded px-2">
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View className="flex-1 justify-center p-4 bg-white items-center mt-[-50px]">
+        <Text className="text-[#3F5F90] text-2xl font-bold mb-6">Sign Up</Text>
+        <View className="w-4/5 my-1">
+          <Text className="font-bold text-lg mb-1">Email</Text>
           <TextInput
-            className="flex-1 py-2"
-            placeholder="Enter your password"
-            value={password}
-            onChangeText={(text) => {
-              setPassword(text);
-              validatePassword(text);
-            }}
-            secureTextEntry={!showPassword}
+            className="p-2 border border-gray-300 rounded"
+            placeholder="Enter your email"
+            value={userName}
+            onChangeText={setUserName}
+            keyboardType="email-address"
+            autoCapitalize="none"
           />
-          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-            <Icon
-              name={showPassword ? "visibility" : "visibility-off"}
-              size={24}
-              color="#000"
-            />
-          </TouchableOpacity>
         </View>
-        {passwordError ? (
-          <Text className="text-red-500 text-sm mt-2">{`* ${passwordError}`}</Text>
-        ) : null}
-      </View>
-      <View className="w-4/5 my-1">
-        <Text className="font-bold text-lg mb-1">Repeat Password</Text>
-        <View className="flex-row items-center border border-gray-300 rounded px-2">
-          <TextInput
-            className="flex-1 py-2"
-            placeholder="Repeat your password"
-            value={repeatPassword}
-            onChangeText={setRepeatPassword}
-            secureTextEntry={!showRepeatPassword}
-          />
-          <TouchableOpacity
-            onPress={() => setShowRepeatPassword(!showRepeatPassword)}
-          >
-            <Icon
-              name={showRepeatPassword ? "visibility" : "visibility-off"}
-              size={24}
-              color="#000"
+        <View className="w-4/5 my-1">
+          <Text className="font-bold text-lg mb-1">Password</Text>
+          <View className="flex-row items-center border border-gray-300 rounded px-2">
+            <TextInput
+              className="flex-1 py-2"
+              placeholder="Enter your password"
+              value={password}
+              onChangeText={(text) => {
+                setPassword(text);
+                validatePassword(text);
+              }}
+              secureTextEntry={!showPassword}
             />
-          </TouchableOpacity>
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+              <Icon
+                name={showPassword ? "visibility" : "visibility-off"}
+                size={24}
+                color="#000"
+              />
+            </TouchableOpacity>
+          </View>
+          {passwordError ? (
+            <Text className="text-red-500 text-sm mt-2">{`* ${passwordError}`}</Text>
+          ) : null}
         </View>
-      </View>
-      <Pressable
-        className="w-4/5 p-3 bg-customBlue2 rounded mt-3 items-center"
-        onPress={handleRegister}
-      >
-        <Text className="text-white text-lg font-bold">Sign Up</Text>
-      </Pressable>
-      <View className="flex-row mt-5">
-        <Text className="text-base text-gray-500">
-          Already have an account?
-        </Text>
-        <Pressable className="ml-2" onPress={() => navigate("Login")}>
-          <Text className="text-[#007BFF] text-base font-bold">Log In</Text>
+        <View className="w-4/5 my-1">
+          <Text className="font-bold text-lg mb-1">Repeat Password</Text>
+          <View className="flex-row items-center border border-gray-300 rounded px-2">
+            <TextInput
+              className="flex-1 py-2"
+              placeholder="Repeat your password"
+              value={repeatPassword}
+              onChangeText={setRepeatPassword}
+              secureTextEntry={!showRepeatPassword}
+            />
+            <TouchableOpacity
+              onPress={() => setShowRepeatPassword(!showRepeatPassword)}
+            >
+              <Icon
+                name={showRepeatPassword ? "visibility" : "visibility-off"}
+                size={24}
+                color="#000"
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+        <Pressable
+          className="w-4/5 p-3 bg-customBlue2 rounded mt-3 items-center"
+          onPress={handleRegister}
+        >
+          <Text className="text-white text-lg font-bold">Sign Up</Text>
         </Pressable>
+        <View className="flex-row mt-5">
+          <Text className="text-base text-gray-500">
+            Already have an account?
+          </Text>
+          <Pressable className="ml-2" onPress={() => navigate("Login")}>
+            <Text className="text-[#007BFF] text-base font-bold">Log In</Text>
+          </Pressable>
+        </View>
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -330,16 +338,18 @@ const HomeScreen: React.FC<{
   navigate: (screen: "Login" | "Register" | "Home") => void;
 }> = ({ user, navigate }) => {
   return (
-    <View className="flex-1 justify-center p-4 bg-white items-center mt-[-50px]">
-      <Text className="text-[#3F5F90] text-2xl font-bold mb-6">
-        Welcome, {user}
-      </Text>
-      <Pressable
-        className="w-4/5 p-3 bg-customBlue2 rounded mt-3 items-center"
-        onPress={() => navigate("Login")}
-      >
-        <Text className="text-white text-lg font-bold">Logout</Text>
-      </Pressable>
-    </View>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View className="flex-1 justify-center p-4 bg-white items-center mt-[-50px]">
+        <Text className="text-[#3F5F90] text-2xl font-bold mb-6">
+          Welcome, {user}
+        </Text>
+        <Pressable
+          className="w-4/5 p-3 bg-customBlue2 rounded mt-3 items-center"
+          onPress={() => navigate("Login")}
+        >
+          <Text className="text-white text-lg font-bold">Logout</Text>
+        </Pressable>
+      </View>
+    </TouchableWithoutFeedback>
   );
 };
