@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   SafeAreaView,
@@ -19,8 +19,6 @@ import {
   SQLiteProvider,
   useSQLiteContext,
 } from "expo-sqlite";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useFocusEffect } from "@react-navigation/native";
 
 const StyledView = styled(View);
 const StyledText = styled(Text);
@@ -124,6 +122,14 @@ const MedTracking = () => {
   };
 
   const handleDayPress = (index: number) => {
+    // Prevent selecting past days
+    if (index < 2) {
+      Alert.alert(
+        "Selection Error",
+        "You cannot add medication for previous days."
+      );
+      return;
+    }
     setSelectedDayIndex(index);
   };
 
@@ -246,6 +252,8 @@ const MedTracking = () => {
                   orderedDays[selectedDayIndex]
                 )
               }
+              orderedDays={orderedDays}
+              selectedDayIndex={selectedDayIndex}
             />
           )}
 
@@ -316,6 +324,8 @@ const MedTracking = () => {
 const AddMedication = ({
   onClose,
   onSave,
+  orderedDays,
+  selectedDayIndex,
 }: {
   onClose: () => void;
   onSave: (
@@ -325,6 +335,8 @@ const AddMedication = ({
     dosageForm: string,
     time: string
   ) => Promise<void>;
+  orderedDays: string[];
+  selectedDayIndex: number;
 }) => {
   const [medicationName, setMedicationName] = useState("");
   const [dosageStrength, setDosageStrength] = useState("");
@@ -359,6 +371,25 @@ const AddMedication = ({
   const handleSaveMedication = () => {
     if (!medicationName || !dosageStrength || !unit || !dosageForm || !time) {
       Alert.alert("Validation Error", "Please fill in all the fields.");
+      return;
+    }
+
+    const currentDateTime = new Date();
+    const selectedDateTime = new Date(
+      currentDateTime.getFullYear(),
+      currentDateTime.getMonth(),
+      currentDateTime.getDate(),
+      time.getHours(),
+      time.getMinutes()
+    );
+
+    // Allow selection of the current time but prevent selecting times earlier than the current time
+    if (
+      orderedDays[selectedDayIndex] === orderedDays[2] && // Check if today is selected
+      selectedDateTime.getTime() <
+        new Date(currentDateTime.setSeconds(0, 0)).getTime() // Ignore seconds and milliseconds for a more lenient comparison
+    ) {
+      Alert.alert("Invalid Time", "You cannot select a time in the past.");
       return;
     }
 
