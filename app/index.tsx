@@ -5,7 +5,7 @@ import {
   TextInput,
   Pressable,
   Alert,
-  Platform,
+  StyleSheet,
   TouchableOpacity,
   Keyboard,
   TouchableWithoutFeedback,
@@ -15,6 +15,16 @@ import { Checkbox } from "react-native-paper";
 import { SQLiteProvider, useSQLiteContext } from "expo-sqlite";
 import { router } from "expo-router";
 import { styled } from "nativewind";
+
+
+// Custom Checkbox Component
+const CustomCheckbox: React.FC<{ checked: boolean; onPress: () => void }> = ({ checked, onPress }) => (
+  <TouchableOpacity onPress={onPress} style={styles.checkboxContainer}>
+    <View style={styles.checkbox}>
+      {checked && <Icon name="check" size={18} color="#FFF" style={styles.checkmark} />}
+    </View>
+  </TouchableOpacity>
+);
 
 // Initialize the database
 const initializeDatabase = async (db: any) => {
@@ -162,14 +172,10 @@ const LoginScreen: React.FC<{
           ) : null}
         </View>
         <View className="w-4/5 flex-row justify-between items-center">
-          <View className="flex-row items-center">
-            <Checkbox
-              status={rememberMe ? "checked" : "unchecked"}
-              onPress={() => setRememberMe(!rememberMe)}
-              color={Platform.OS === 'ios' ? 'black' : undefined} // Adjust color for iOS
-            />
-            <Text className="text-sm ml-2">Remember Me</Text>
-          </View>
+        <View className="flex-row items-center">
+          <CustomCheckbox checked={rememberMe} onPress={() => setRememberMe(!rememberMe)} />
+          <Text className="text-gray-700">Remember Me</Text>
+        </View>
           <TouchableOpacity onPress={handleForgotPassword}>
             <Text className="text-[#007BFF] text-sm">Forgot Password?</Text>
           </TouchableOpacity>
@@ -355,3 +361,45 @@ const HomeScreen: React.FC<{
     </TouchableWithoutFeedback>
   );
 };
+// Styles
+const styles = StyleSheet.create({
+  checkboxRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 15,
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 10,
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderWidth: 1,
+    borderColor: '#3F5F90',
+    borderRadius: 3,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  checkboxChecked: {
+    backgroundColor: '#3F5F90',
+  },
+  checkmark: {
+    color: '#3F5F90',
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  checkboxText: {
+    fontSize: 14,
+    marginLeft: 5,
+  },
+  forgotPassword: {
+    color: '#007BFF',
+    fontSize: 14,
+  },
+  checkboxLabel: {
+    marginLeft: 8,
+  },
+})
