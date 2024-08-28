@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
+  Platform,
   Text,
   View,
   TextInput,
@@ -28,7 +29,7 @@ const ProfileEditPage: React.FC = () => {
 
   // Editable profile state
   const [fullName, setFullName] = useState("");
-  const [gender, setGender] = useState("male");
+  const [selectedGender, setSelectedGender] = useState("male");
   const [dateOfBirth, setDateOfBirth] = useState(new Date());
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
@@ -52,7 +53,7 @@ const ProfileEditPage: React.FC = () => {
         if (profileData) {
           const data = JSON.parse(profileData);
           setFullName(data.fullName || "");
-          setGender(data.gender || "male");
+          setSelectedGender(data.gender || "male");
           setDateOfBirth(new Date(data.dateOfBirth) || new Date());
           setHeight(data.height || "");
           setWeight(data.weight || "");
@@ -87,7 +88,7 @@ const ProfileEditPage: React.FC = () => {
       try {
         const profileData = {
           fullName,
-          gender,
+          selectedGender,
           dateOfBirth: dateOfBirth.toISOString(), // Save date as ISO string
           height,
           weight,
@@ -222,28 +223,41 @@ const ProfileEditPage: React.FC = () => {
             )}
           </View>
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Gender</Text>
-            <View style={styles.radioContainer}>
-              <View style={styles.radioButton}>
-                <RadioButton
-                  value="male"
-                  status={gender === "male" ? "checked" : "unchecked"}
-                  onPress={() => setGender("male")}
-                  color="#3F5F90"
-                />
-                <Text style={styles.radioText}>Male</Text>
-              </View>
-              <View style={styles.radioButton}>
-                <RadioButton
-                  value="female"
-                  status={gender === "female" ? "checked" : "unchecked"}
-                  onPress={() => setGender("female")}
-                  color="#3F5F90"
-                />
-                <Text style={styles.radioText}>Female</Text>
-              </View>
-            </View>
-          </View>
+  <Text style={styles.label}>Gender</Text>
+  <View style={styles.radioContainer}>
+    <TouchableOpacity
+      style={[
+        styles.radioButton,
+        selectedGender === 'male' && styles.selectedRadioButton,
+      ]}
+      onPress={() => setSelectedGender('male')}
+    >
+      <View
+        style={[
+          styles.radioCircle,
+          selectedGender === 'male' && styles.selectedRadioCircle,
+        ]}
+      />
+      <Text style={styles.radioText}>Male</Text>
+    </TouchableOpacity>
+    <TouchableOpacity
+      style={[
+        styles.radioButton,
+        selectedGender === 'female' && styles.selectedRadioButton,
+      ]}
+      onPress={() => setSelectedGender('female')}
+    >
+      <View
+        style={[
+          styles.radioCircle,
+          selectedGender === 'female' && styles.selectedRadioCircle,
+        ]}
+      />
+      <Text style={styles.radioText}>Female</Text>
+    </TouchableOpacity>
+  </View>
+</View>
+
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Date of Birth</Text>
             <TouchableOpacity
@@ -460,6 +474,7 @@ const styles = StyleSheet.create({
     padding: 10,
     fontSize: 16,
     height: 80,
+    paddingTop: 10, // Added paddingTop for iOS
     textAlignVertical: "top",
   },
   dateInput: {
@@ -490,24 +505,43 @@ const styles = StyleSheet.create({
   pickerContainer: {
     borderColor: "#ddd",
     borderWidth: 1,
-    borderRadius: 5,
+    borderRadius: 8,
     overflow: "hidden",
   },
   picker: {
-    height: 40,
+    height: Platform.OS === 'ios' ? 50 : 40, // Adjusted height for iOS
+    justifyContent: 'center',
     width: "100%",
+    paddingLeft: 10,
   },
   radioContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
+    marginTop: 5,
   },
   radioButton: {
     flexDirection: "row",
     alignItems: "center",
   },
+  selectedRadioButton: {
+    backgroundColor: '#e0e0e0',
+  },
+  radioCircle: {
+    height: 20,
+    width: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#333', // Default border color
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  selectedRadioCircle: {
+    borderColor: '#3F5F90', // Change this color to your desired color
+  },
   radioText: {
     fontSize: 16,
     marginLeft: 8,
+    color: '#333',
   },
   buttonContainer: {
     flexDirection: "row",
@@ -532,6 +566,7 @@ const styles = StyleSheet.create({
     fontSize: 12, // Font size
     marginTop: 4, // Margin to separate from the input field
   },
+
 });
 
 export default ProfileEditPage;
