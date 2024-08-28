@@ -257,7 +257,7 @@ const MedTracking = () => {
               className="bg-customBlue py-3 px-6 rounded-lg mt-4 shadow-md"
               onPress={() => setShowAddMedication(true)}
             >
-              <StyledText className="text-black text-lg font-bold text-center">
+              <StyledText className="text-white text-lg font-bold text-center">
                 <StyledText className="text-xl font-bold mr-2">+</StyledText>{" "}
                 Add Medication
               </StyledText>
@@ -569,7 +569,7 @@ const AddMedication = ({
 
       {/* Cancel Button */}
       <StyledTouchableOpacity
-        className="bg-gray-400 py-3 rounded-lg mt-2 shadow-md"
+        className="bg-customBlue2 py-3 rounded-lg mt-2 shadow-md"
         onPress={onClose}
       >
         <StyledText className="text-white text-lg font-bold text-center">

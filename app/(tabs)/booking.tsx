@@ -444,7 +444,7 @@ function Booking({ onBack }: { onBack: any }) {
         </StyledTouchableOpacity>
 
         <StyledTouchableOpacity
-          className="bg-gray-400 py-2 rounded mt-5"
+          className="bg-customBlue2 py-2 rounded mt-5"
           onPress={onBack}
         >
           <StyledText className="text-white text-center text-lg">
