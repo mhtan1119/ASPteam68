@@ -306,10 +306,14 @@ const ProfileEditPage: React.FC = () => {
                 style={styles.picker}
               >
                 <Picker.Item label="Select blood type" value="" />
-                <Picker.Item label="A" value="A" />
-                <Picker.Item label="B" value="B" />
-                <Picker.Item label="AB" value="AB" />
-                <Picker.Item label="O" value="O" />
+                <Picker.Item label="A+" value="A+" />
+                <Picker.Item label="A-" value="A-" />
+                <Picker.Item label="B+" value="B+" />
+                <Picker.Item label="B-" value="B-" />
+                <Picker.Item label="AB+" value="AB+" />
+                <Picker.Item label="AB-" value="AB-" />
+                <Picker.Item label="O+" value="O+" />
+                <Picker.Item label="O-" value="O-" />
               </Picker>
             </View>
           </View>
@@ -535,7 +539,7 @@ const styles = StyleSheet.create({
     height: 10,
     width: 10,
     borderRadius: 5,
-    backgroundColor: '#007AFF', // Inner circle color for selected state
+    backgroundColor: '#3F5F90', // Inner circle color for selected state
   },
   buttonContainer: {
     flexDirection: "row",
