@@ -223,39 +223,27 @@ const ProfileEditPage: React.FC = () => {
             )}
           </View>
           <View style={styles.inputContainer}>
-  <Text style={styles.label}>Gender</Text>
-  <View style={styles.radioContainer}>
-    <TouchableOpacity
-      style={[
-        styles.radioButton,
-        selectedGender === 'male' && styles.selectedRadioButton,
-      ]}
-      onPress={() => setSelectedGender('male')}
-    >
-      <View
-        style={[
-          styles.radioCircle,
-          selectedGender === 'male' && styles.selectedRadioCircle,
-        ]}
-      />
-      <Text style={styles.radioText}>Male</Text>
-    </TouchableOpacity>
-    <TouchableOpacity
-      style={[
-        styles.radioButton,
-        selectedGender === 'female' && styles.selectedRadioButton,
-      ]}
-      onPress={() => setSelectedGender('female')}
-    >
-      <View
-        style={[
-          styles.radioCircle,
-          selectedGender === 'female' && styles.selectedRadioCircle,
-        ]}
-      />
-      <Text style={styles.radioText}>Female</Text>
-    </TouchableOpacity>
-  </View>
+          <Text style={styles.label}>Gender</Text>
+<View style={styles.radioContainer}>
+  <TouchableOpacity
+    style={styles.radioButton}
+    onPress={() => setSelectedGender('male')}
+  >
+    <View style={styles.radioCircle}>
+      {selectedGender === 'male' && <View style={styles.selectedInnerCircle} />}
+    </View>
+    <Text style={styles.radioText}>Male</Text>
+  </TouchableOpacity>
+  <TouchableOpacity
+    style={styles.radioButton}
+    onPress={() => setSelectedGender('female')}
+  >
+    <View style={styles.radioCircle}>
+      {selectedGender === 'female' && <View style={styles.selectedInnerCircle} />}
+    </View>
+    <Text style={styles.radioText}>Female</Text>
+  </TouchableOpacity>
+</View>
 </View>
 
           <View style={styles.inputContainer}>
@@ -542,6 +530,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginLeft: 8,
     color: '#333',
+  },
+  selectedInnerCircle: {
+    height: 10,
+    width: 10,
+    borderRadius: 5,
+    backgroundColor: '#007AFF', // Inner circle color for selected state
   },
   buttonContainer: {
     flexDirection: "row",
