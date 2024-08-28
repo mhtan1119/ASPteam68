@@ -5,6 +5,7 @@ import {
   TextInput,
   Pressable,
   Alert,
+  Platform,
   TouchableOpacity,
   Keyboard,
   TouchableWithoutFeedback,
@@ -165,6 +166,7 @@ const LoginScreen: React.FC<{
             <Checkbox
               status={rememberMe ? "checked" : "unchecked"}
               onPress={() => setRememberMe(!rememberMe)}
+              color={Platform.OS === 'ios' ? 'black' : undefined} // Adjust color for iOS
             />
             <Text className="text-sm ml-2">Remember Me</Text>
           </View>
