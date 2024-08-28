@@ -18,9 +18,9 @@ import {
   polyclinics,
   privateHospitals,
   publicHospitals,
-  services, // Import services
+  services,
 } from "@/constants/hospitalData";
-import { useRouter } from "expo-router"; // Import useRouter for navigation
+import { useRouter } from "expo-router";
 
 // Define the Location interface
 interface Location {
@@ -30,13 +30,13 @@ interface Location {
   address: string;
   hours: string;
   phone: string;
-  services?: string[]; // Add services as an optional field
+  services?: string[];
 }
 
 export default function MapScreen() {
   const [region, setRegion] = useState<Region>({
-    latitude: 1.3521, // Central Singapore latitude
-    longitude: 103.8198, // Central Singapore longitude
+    latitude: 1.3521,
+    longitude: 103.8198,
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   });
@@ -45,12 +45,10 @@ export default function MapScreen() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [filteredLocations, setFilteredLocations] = useState<Location[]>([]);
-  const [selectedLocation, setSelectedLocation] = useState<Location | null>(
-    null
-  );
+  const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const mapRef = useRef<MapView>(null);
-  const router = useRouter(); // Initialize useRouter for navigation
+  const router = useRouter();
 
   const zoomIn = () => {
     const newRegion = {
@@ -76,11 +74,10 @@ export default function MapScreen() {
     }
   };
 
-  // Function to recenter the map to the default region
   const recenterMap = () => {
     const defaultRegion = {
-      latitude: 1.3521, // Central Singapore latitude
-      longitude: 103.8198, // Central Singapore longitude
+      latitude: 1.3521,
+      longitude: 103.8198,
       latitudeDelta: 0.0922,
       longitudeDelta: 0.0421,
     };
@@ -120,7 +117,7 @@ export default function MapScreen() {
   const handleScreenPress = () => {
     if (!isDragging) {
       setShowDropdown(false);
-      Keyboard.dismiss(); // Closes the keyboard if open
+      Keyboard.dismiss();
     }
   };
 
@@ -145,14 +142,13 @@ export default function MapScreen() {
     setFilteredLocations(allLocations);
   };
 
-  // Function to get random services from the array
   const getRandomServices = (num: number) => {
     const shuffled = [...services].sort(() => 0.5 - Math.random());
     return shuffled.slice(0, num);
   };
 
   const openModal = (location: Location) => {
-    const selectedServices = getRandomServices(3); // Get 3 random services
+    const selectedServices = getRandomServices(3);
     setSelectedLocation({ ...location, services: selectedServices });
     setModalVisible(true);
   };
@@ -161,13 +157,14 @@ export default function MapScreen() {
     setModalVisible(false);
     setSelectedLocation(null);
   };
+
   const handleBookAppointment = (locationName: string) => {
     closeModal();
     router.push({
-      pathname: "/booking", // Path to your booking page
+      pathname: "/booking",
       params: {
         locationName,
-        clearForm: "true", // Ensures the form is cleared before the new appointment is made
+        clearForm: "true",
       },
     });
   };
@@ -188,15 +185,13 @@ export default function MapScreen() {
             onChangeText={(text) => {
               setSearchQuery(text);
               setShowDropdown(true);
-
-              // Filter locations based on the search query
               if (text.length > 0) {
                 const filtered = allLocations.filter((location) =>
                   location.name.toLowerCase().includes(text.toLowerCase())
                 );
                 setFilteredLocations(filtered);
               } else {
-                setFilteredLocations(allLocations); // Show all locations if search query is empty
+                setFilteredLocations(allLocations);
               }
             }}
             selectionColor="black"
@@ -236,8 +231,8 @@ export default function MapScreen() {
         >
           <Marker
             coordinate={{
-              latitude: 1.3521, // Central Singapore latitude
-              longitude: 103.8198, // Central Singapore longitude
+              latitude: 1.3521,
+              longitude: 103.8198,
             }}
           >
             <Ionicons name="person-circle" size={40} color="white" />
@@ -252,7 +247,10 @@ export default function MapScreen() {
               }}
               title={location.name}
             >
-              <Callout className="max-w-xs p-2">
+              <Callout
+                onPress={() => openModal(location)}
+                className="max-w-xs p-2"
+              >
                 <View>
                   <Text className="font-bold mb-1 text-sm">
                     {location.name}
@@ -263,7 +261,7 @@ export default function MapScreen() {
                   </Text>
                   <TouchableOpacity
                     className="mt-2 bg-customBlue p-2 rounded-md"
-                    onPress={() => openModal(location)}
+                    onPress={() => {}}
                   >
                     <Text className="text-white text-center text-xs">
                       Click for more info
@@ -295,7 +293,6 @@ export default function MapScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Circular Button to show only Polyclinics */}
         <View className="absolute top-10 left-5 items-center">
           <TouchableOpacity
             className="w-12 h-12 bg-green-500 rounded-full justify-center items-center shadow-lg"
@@ -306,7 +303,6 @@ export default function MapScreen() {
           <Text className="mt-1 text-sm text-black">Polyclinics</Text>
         </View>
 
-        {/* Circular Button to show only Private Hospitals */}
         <View className="absolute top-10 left-24 items-center">
           <TouchableOpacity
             className="w-12 h-12 bg-orange-500 rounded-full justify-center items-center shadow-lg"
@@ -317,7 +313,6 @@ export default function MapScreen() {
           <Text className="mt-1 text-sm text-black">Private Hospitals</Text>
         </View>
 
-        {/* Circular Button to show only Public Hospitals */}
         <View className="absolute top-10 left-52 items-center">
           <TouchableOpacity
             className="w-12 h-12 bg-blue-500 rounded-full justify-center items-center shadow-lg"
@@ -328,7 +323,6 @@ export default function MapScreen() {
           <Text className="mt-1 text-sm text-black">Public Hospitals</Text>
         </View>
 
-        {/* Circular Button to Show All Locations */}
         <View className="absolute top-10 left-80 items-center">
           <TouchableOpacity
             className="w-12 h-12 bg-purple-500 rounded-full justify-center items-center shadow-lg"
@@ -339,7 +333,6 @@ export default function MapScreen() {
           <Text className="mt-1 text-sm text-black">All Locations</Text>
         </View>
 
-        {/* Modal for additional information */}
         {selectedLocation && (
           <Modal
             animationType="slide"
