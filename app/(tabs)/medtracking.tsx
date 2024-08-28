@@ -169,6 +169,32 @@ const MedTracking = () => {
     }
   };
 
+  const deleteMedication = async (id: number) => {
+    try {
+      await db.runAsync("DELETE FROM medications WHERE id = ?;", [id]);
+      Alert.alert("Success", "Medication deleted successfully.");
+      fetchMedications(); // Refresh the medication list after deletion
+    } catch (error) {
+      console.log("Error deleting medication:", error);
+    }
+  };
+
+  const confirmDeleteMedication = (id: number) => {
+    Alert.alert(
+      "Confirm Deletion",
+      "Are you sure you want to delete this medication?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => deleteMedication(id),
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
   const toggleMedicationStatus = (id: number) => {
     setMedicationStatuses((prevStatuses) => {
       const newStatus =
@@ -269,8 +295,9 @@ const MedTracking = () => {
                     {meds.map((medication) => (
                       <StyledView
                         key={medication.id}
-                        className="mb-4 p-4 border rounded-lg bg-customBlue flex-row items-center"
+                        className="mb-4 p-4 border rounded-lg bg-customBlue flex-row items-center justify-between"
                       >
+                        {/* Medication Status Toggle */}
                         <StyledTouchableOpacity
                           className="w-8 h-8 border border-black rounded-sm mr-4 items-center justify-center bg-white"
                           onPress={() => toggleMedicationStatus(medication.id)}
@@ -283,7 +310,9 @@ const MedTracking = () => {
                               : ""}
                           </StyledText>
                         </StyledTouchableOpacity>
-                        <StyledView>
+
+                        {/* Medication Details */}
+                        <StyledView className="flex-1">
                           <StyledText className="text-lg font-bold text-black">
                             {medication.name}
                           </StyledText>
@@ -292,6 +321,16 @@ const MedTracking = () => {
                             {medication.dosageForm}
                           </StyledText>
                         </StyledView>
+
+                        {/* Delete Button with Confirmation */}
+                        <StyledTouchableOpacity
+                          onPress={() => confirmDeleteMedication(medication.id)}
+                          className="ml-4"
+                        >
+                          <StyledText className="text-red-500 text-lg font-bold">
+                            ✖️
+                          </StyledText>
+                        </StyledTouchableOpacity>
                       </StyledView>
                     ))}
                   </React.Fragment>
