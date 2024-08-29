@@ -12,7 +12,11 @@
     "lint": "expo lint"
   },
   "jest": {
-    "preset": "jest-expo"
+    "preset": "jest-expo",
+    "setupFilesAfterEnv": ["./jest.setup.js"],
+    "transformIgnorePatterns": [
+      "node_modules/(?!(jest-)?react-native|@react-native|@react-navigation|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|@unimodules/.*|unimodules|sentry-expo|native-base)"
+    ]
   },
   "dependencies": {
     "@expo/metro-runtime": "~3.2.3",
@@ -52,6 +56,8 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "@testing-library/jest-native": "^5.4.3",
+    "@testing-library/react-native": "^12.6.1",
     "@types/jest": "^29.5.12",
     "@types/react": "~18.2.45",
     "@types/react-native-simple-radio-button": "^2.7.7",

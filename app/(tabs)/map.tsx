@@ -228,6 +228,7 @@ export default function MapScreen() {
           onPanDrag={() => setIsDragging(true)}
           onTouchStart={() => setIsDragging(false)}
           onTouchEnd={() => setTimeout(() => setIsDragging(false), 300)}
+          testID="map-view"
         >
           <Marker
             coordinate={{
