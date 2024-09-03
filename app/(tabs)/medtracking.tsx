@@ -1,3 +1,4 @@
+// Import necessary modules and components from React and React Native
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -10,22 +11,23 @@ import {
   Alert,
   Modal,
 } from "react-native";
-import { Picker } from "@react-native-picker/picker";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import moment from "moment";
-import { styled } from "nativewind";
+import { Picker } from "@react-native-picker/picker"; // Import Picker for dropdowns
+import DateTimePicker from "@react-native-community/datetimepicker"; // Import DateTimePicker for time selection
+import moment from "moment"; // Import moment for date manipulation
+import { styled } from "nativewind"; // Import styled components for Tailwind-like styling
 import {
   SQLiteBindParams,
   SQLiteProvider,
   useSQLiteContext,
-} from "expo-sqlite";
+} from "expo-sqlite"; // Import SQLite components for local database management
 
+// Define styled components for consistent styling
 const StyledView = styled(View);
 const StyledText = styled(Text);
 const StyledTouchableOpacity = styled(TouchableOpacity);
 const StyledTextInput = styled(TextInput);
 
-// Initialize the database
+// Function to initialize the local SQLite database
 const initializeDatabase = async (db: any) => {
   try {
     await db.execAsync(`
@@ -46,6 +48,7 @@ const initializeDatabase = async (db: any) => {
   }
 };
 
+// Main App component providing SQLite context
 export default function App() {
   return (
     <SQLiteProvider databaseName="data.db" onInit={initializeDatabase}>
@@ -54,8 +57,9 @@ export default function App() {
   );
 }
 
+// Component for medication tracking
 const MedTracking = () => {
-  const db = useSQLiteContext();
+  const db = useSQLiteContext(); // Access SQLite database context
   const daysOfWeek = [
     "Sunday",
     "Monday",
@@ -68,16 +72,18 @@ const MedTracking = () => {
   const today = new Date();
   const currentDayIndex = today.getDay();
 
+  // Order days to display them around the current day
   const orderedDays = [
     daysOfWeek[(currentDayIndex + 5) % 7],
     daysOfWeek[(currentDayIndex + 6) % 7],
-    daysOfWeek[currentDayIndex], // Current day (middle day)
+    daysOfWeek[currentDayIndex],
     daysOfWeek[(currentDayIndex + 1) % 7],
     daysOfWeek[(currentDayIndex + 2) % 7],
     daysOfWeek[(currentDayIndex + 3) % 7],
     daysOfWeek[(currentDayIndex + 4) % 7],
   ];
 
+  // State variables for managing selected day, form visibility, and medication data
   const [selectedDayIndex, setSelectedDayIndex] = useState<number>(2); // Start with the middle day selected
   const [showAddMedication, setShowAddMedication] = useState(false); // To toggle add medication form visibility
   const [medicationStatuses, setMedicationStatuses] = useState<
@@ -95,20 +101,21 @@ const MedTracking = () => {
     status: string; // New status field
   }
 
-  const [medications, setMedications] = useState<Medication[]>([]);
+  const [medications, setMedications] = useState<Medication[]>([]); // State for storing medication list
 
-  // Fetch medications whenever selectedDayIndex changes
+  // Fetch medications whenever the selected day changes
   useEffect(() => {
     fetchMedications();
   }, [selectedDayIndex]);
 
+  // Function to fetch medications from the local SQLite database
   const fetchMedications = () => {
     try {
       const result: Medication[] = db.getAllSync(
         "SELECT * FROM medications WHERE date = ? ORDER BY time ASC;",
         [orderedDays[selectedDayIndex]]
       );
-      setMedications(result); // Assuming the result is an array of rows
+      setMedications(result); // Set fetched medications to state
 
       // Initialize statuses
       const initialStatuses: Record<number, string> = {};
@@ -121,9 +128,10 @@ const MedTracking = () => {
     }
   };
 
+  // Function to handle day selection
   const handleDayPress = (index: number) => {
-    // Prevent selecting past days
     if (index < 2) {
+      // Prevent selecting past days
       Alert.alert(
         "Selection Error",
         "You cannot add medication for previous days."
@@ -133,6 +141,7 @@ const MedTracking = () => {
     setSelectedDayIndex(index);
   };
 
+  // Function to group medications by time for easier display
   const groupMedicationsByTime = (medications: Medication[]) => {
     return medications.reduce((acc, medication) => {
       if (!acc[medication.time]) {
@@ -143,12 +152,14 @@ const MedTracking = () => {
     }, {} as Record<string, Medication[]>);
   };
 
+  // Filter medications for the selected day
   const filteredMedications = groupMedicationsByTime(
     medications.filter(
       (medication) => medication.date === orderedDays[selectedDayIndex]
     )
   );
 
+  // Function to save a new medication to the database
   const saveMedication = async (
     name: string,
     dosageStrength: string,
@@ -163,22 +174,24 @@ const MedTracking = () => {
         [name, dosageStrength, unit, dosageForm, time, date] as SQLiteBindParams
       );
       Alert.alert("Success", "Medication saved successfully.");
-      fetchMedications(); // Fetch updated medications list
+      fetchMedications(); // Refresh medication list after saving
     } catch (error) {
       console.log("Error saving medication:", error);
     }
   };
 
+  // Function to delete a medication from the database
   const deleteMedication = async (id: number) => {
     try {
       await db.runAsync("DELETE FROM medications WHERE id = ?;", [id]);
       Alert.alert("Success", "Medication deleted successfully.");
-      fetchMedications(); // Refresh the medication list after deletion
+      fetchMedications(); // Refresh medication list after deletion
     } catch (error) {
       console.log("Error deleting medication:", error);
     }
   };
 
+  // Function to confirm medication deletion
   const confirmDeleteMedication = (id: number) => {
     Alert.alert(
       "Confirm Deletion",
@@ -195,6 +208,7 @@ const MedTracking = () => {
     );
   };
 
+  // Function to toggle the status of a medication
   const toggleMedicationStatus = (id: number) => {
     setMedicationStatuses((prevStatuses) => {
       const newStatus =
@@ -207,6 +221,7 @@ const MedTracking = () => {
     });
   };
 
+  // Function to save medication statuses to the database
   const saveStatuses = async () => {
     try {
       for (const [id, status] of Object.entries(medicationStatuses)) {
@@ -221,6 +236,7 @@ const MedTracking = () => {
     }
   };
 
+  // Component rendering starts here
   return (
     <SafeAreaView className="flex-1 bg-white">
       <ScrollView contentContainerStyle={{ padding: 16 }}>
@@ -233,7 +249,7 @@ const MedTracking = () => {
               .format("D MMM")}
           </StyledText>
 
-          {/* Day Circles */}
+          {/* Day Selection Circles */}
           <StyledView className="flex-row justify-between mb-4 w-full max-w-[300px]">
             {orderedDays.map((day, index) => (
               <StyledTouchableOpacity
@@ -251,7 +267,7 @@ const MedTracking = () => {
             ))}
           </StyledView>
 
-          {/* Add Medication Button */}
+          {/* Button to Add Medication */}
           {!showAddMedication && (
             <StyledTouchableOpacity
               className="bg-customBlue py-3 px-6 rounded-lg mt-4 shadow-md"
@@ -264,7 +280,7 @@ const MedTracking = () => {
             </StyledTouchableOpacity>
           )}
 
-          {/* Add Medication Form */}
+          {/* Form to Add Medication */}
           {showAddMedication && (
             <AddMedication
               onClose={() => setShowAddMedication(false)}
@@ -283,7 +299,7 @@ const MedTracking = () => {
             />
           )}
 
-          {/* Medication Items */}
+          {/* Display of Medication Items */}
           {!showAddMedication && (
             <StyledView className="mt-8 w-full">
               {Object.keys(filteredMedications).length > 0 ? (
@@ -343,7 +359,7 @@ const MedTracking = () => {
             </StyledView>
           )}
 
-          {/* Save Button */}
+          {/* Button to Save Statuses */}
           {!showAddMedication && (
             <StyledTouchableOpacity
               className="bg-customBlue py-3 px-6 rounded-lg mt-4 shadow-md"
@@ -360,6 +376,7 @@ const MedTracking = () => {
   );
 };
 
+// Component to add a new medication
 const AddMedication = ({
   onClose,
   onSave,
@@ -377,6 +394,7 @@ const AddMedication = ({
   orderedDays: string[];
   selectedDayIndex: number;
 }) => {
+  // State variables for medication form inputs
   const [medicationName, setMedicationName] = useState("");
   const [dosageStrength, setDosageStrength] = useState("");
   const [unit, setUnit] = useState("mg");
@@ -386,6 +404,7 @@ const AddMedication = ({
   const [showUnitPicker, setShowUnitPicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
 
+  // Function to handle time change in DateTimePicker
   const onTimeChange = (event: any, selectedTime: Date | undefined) => {
     const currentTime = selectedTime || time;
     setTime(currentTime);
@@ -394,6 +413,7 @@ const AddMedication = ({
     }
   };
 
+  // Function to format time for display
   const formatTime = (time: Date) => {
     const hours = time.getHours();
     const minutes = time.getMinutes();
@@ -403,10 +423,12 @@ const AddMedication = ({
     return `${formattedHours}:${formattedMinutes} ${ampm}`;
   };
 
+  // Function to confirm time selection in the picker
   const confirmTime = () => {
     setShowTimePicker(false); // Close the picker when the user confirms
   };
 
+  // Function to handle medication saving
   const handleSaveMedication = () => {
     if (!medicationName || !dosageStrength || !unit || !dosageForm || !time) {
       Alert.alert("Validation Error", "Please fill in all the fields.");
@@ -436,6 +458,7 @@ const AddMedication = ({
     onClose();
   };
 
+  // Render the add medication form
   return (
     <StyledView className="w-full">
       <StyledText className="text-lg font-bold mb-2">
@@ -534,7 +557,7 @@ const AddMedication = ({
                 mode="time"
                 display="spinner"
                 onChange={onTimeChange}
-                textColor="black" // Ensures the text is black and visible
+                textColor="black"
               />
               <StyledTouchableOpacity
                 className="mt-4 bg-customBlue py-2 rounded-lg"
@@ -558,6 +581,7 @@ const AddMedication = ({
         />
       )}
 
+      {/* Save Medication Button */}
       <StyledTouchableOpacity
         className="bg-customBlue py-3 rounded-lg mt-4 shadow-md"
         onPress={handleSaveMedication}

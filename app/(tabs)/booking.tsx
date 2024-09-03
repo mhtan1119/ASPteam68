@@ -1,3 +1,4 @@
+// Import necessary modules and components from React and React Native
 import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
@@ -10,16 +11,16 @@ import {
   SafeAreaView,
   Alert,
 } from "react-native";
-import { Picker } from "@react-native-picker/picker";
-import RadioForm from "react-native-simple-radio-button";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import { styled } from "nativewind";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Picker } from "@react-native-picker/picker"; // Import Picker for dropdowns
+import RadioForm from "react-native-simple-radio-button"; // Import RadioForm for radio buttons
+import DateTimePicker from "@react-native-community/datetimepicker"; // Import DateTimePicker for date selection
+import { styled } from "nativewind"; // Import styled components for Tailwind-like styling
+import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage for local data storage
 import {
   SQLiteBindParams,
   SQLiteProvider,
   useSQLiteContext,
-} from "expo-sqlite";
+} from "expo-sqlite"; // Import SQLite components for local database management
 import {
   HospitalLocation,
   allLocations,
@@ -27,10 +28,11 @@ import {
   privateHospitals,
   publicHospitals,
   services,
-} from "@/constants/hospitalData";
-import { useRouter, useLocalSearchParams } from "expo-router";
-import { useFocusEffect } from "@react-navigation/native";
+} from "@/constants/hospitalData"; // Import data constants
+import { useRouter, useLocalSearchParams } from "expo-router"; // Import routing hooks
+import { useFocusEffect } from "@react-navigation/native"; // Import hook for detecting screen focus
 
+// Define styled components for consistent styling
 const StyledSafeAreaView = styled(SafeAreaView);
 const StyledScrollView = styled(ScrollView);
 const StyledText = styled(Text);
@@ -38,9 +40,10 @@ const StyledTextInput = styled(TextInput);
 const StyledTouchableOpacity = styled(TouchableOpacity);
 const StyledView = styled(View);
 
-// Initialize the database
+// Function to initialize the local SQLite database
 const initializeDatabase = async (db: any) => {
   try {
+    // Create appointments table if it doesn't exist
     await db.execAsync(
       `CREATE TABLE IF NOT EXISTS appointments (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -57,6 +60,7 @@ const initializeDatabase = async (db: any) => {
   }
 };
 
+// Main App component, providing the SQLite context
 export default function App() {
   return (
     <SQLiteProvider databaseName="data.db" onInit={initializeDatabase}>
@@ -65,9 +69,11 @@ export default function App() {
   );
 }
 
+// Main component to manage app navigation between booking and viewing appointments
 function Main() {
-  const [showBookedAppointments, setShowBookedAppointments] = useState(true);
+  const [showBookedAppointments, setShowBookedAppointments] = useState(true); // State to show or hide booked appointments
 
+  // Conditional rendering based on the state
   return showBookedAppointments ? (
     <BookedAppointments onClose={() => setShowBookedAppointments(false)} />
   ) : (
@@ -75,9 +81,13 @@ function Main() {
   );
 }
 
+// Component for making a new booking
 function Booking({ onBack }: { onBack: any }) {
+  // Access SQLite database context
   const db = useSQLiteContext();
-  const router = useRouter();
+  const router = useRouter(); // Router hook for navigation
+
+  // Retrieve passed parameters from previous screens
   const {
     location: passedLocation,
     service: passedService,
@@ -88,7 +98,7 @@ function Booking({ onBack }: { onBack: any }) {
     clearForm,
   } = useLocalSearchParams();
 
-  const [userName, setUserName] = useState("");
+  const [userName, setUserName] = useState(""); // State for storing the user's name
 
   // Fetch the user's name whenever the screen is focused
   useFocusEffect(
@@ -109,8 +119,10 @@ function Booking({ onBack }: { onBack: any }) {
     }, [])
   );
 
+  // Get all location names from the data constants
   const healthcareFacilityNames = allLocations.map((location) => location.name);
 
+  // Generate time options for the appointment timeslot picker
   const timeOptions = [];
   for (let h = 8; h <= 17; h++) {
     for (let m = 0; m < 60; m += 15) {
@@ -121,6 +133,7 @@ function Booking({ onBack }: { onBack: any }) {
   }
   timeOptions.push("18:00");
 
+  // States for various appointment details
   const [service, setService] = useState(passedService || "");
   const [location, setLocation] = useState(locationName || "");
   const [date, setDate] = useState(
@@ -135,14 +148,17 @@ function Booking({ onBack }: { onBack: any }) {
   const [allergy, setAllergy] = useState(0);
   const [allergyDetails, setAllergyDetails] = useState("");
 
+  // States to manage the visibility of modal dialogs
   const [serviceModalVisible, setServiceModalVisible] = useState(false);
   const [locationModalVisible, setLocationModalVisible] = useState(false);
   const [timeModalVisible, setTimeModalVisible] = useState(false);
 
+  // Temporary states for selecting options in modals
   const [tempService, setTempService] = useState(service);
   const [tempLocation, setTempLocation] = useState(location);
   const [tempTime, setTempTime] = useState(time);
 
+  // Effect to update state when passed parameters change
   useEffect(() => {
     if (locationName) setLocation(locationName);
     if (passedService) setService(passedService);
@@ -155,6 +171,7 @@ function Booking({ onBack }: { onBack: any }) {
     if (passedRemarks) setRemarks(passedRemarks);
   }, [passedService, locationName, passedDate, passedTime, passedRemarks]);
 
+  // Effect to clear form or reset states when instructed
   useEffect(() => {
     if (clearForm) {
       setService("");
@@ -173,11 +190,13 @@ function Booking({ onBack }: { onBack: any }) {
     { label: "No", value: 0 },
   ];
 
+  // Handler to confirm service selection
   const handleServiceSelect = () => {
     setService(tempService);
     setServiceModalVisible(false);
   };
 
+  // Effect to update appointment details on focus
   useFocusEffect(
     useCallback(() => {
       if (locationName) setLocation(locationName);
@@ -194,6 +213,7 @@ function Booking({ onBack }: { onBack: any }) {
     }, [locationName, passedService, passedDate, passedTime, passedRemarks])
   );
 
+  // Handlers for selecting location and time
   const handleLocationSelect = () => {
     setLocation(tempLocation);
     setLocationModalVisible(false);
@@ -204,6 +224,7 @@ function Booking({ onBack }: { onBack: any }) {
     setTimeModalVisible(false);
   };
 
+  // Handler for date change in DateTimePicker
   const handleDateChange = (event: any, selectedDate: Date | undefined) => {
     const currentDate = selectedDate || date;
     const today = new Date();
@@ -219,6 +240,7 @@ function Booking({ onBack }: { onBack: any }) {
     setShowDatePicker(Platform.OS === "ios");
   };
 
+  // Handler to save appointment details to the local database
   const handleSaveAppointment = async () => {
     if (!service || !location || !date || !time) {
       Alert.alert("Error", "Please fill in all the fields.");
@@ -243,6 +265,7 @@ function Booking({ onBack }: { onBack: any }) {
     }
   };
 
+  // Component rendering starts here
   return (
     <StyledSafeAreaView className="flex-1 bg-gray-100">
       <StyledScrollView className="p-5">
@@ -250,11 +273,12 @@ function Booking({ onBack }: { onBack: any }) {
           APPOINTMENTS
         </StyledText>
 
-        {/* Display user’s name above services */}
+        {/* Display user's name */}
         <StyledText className="text-lg font-semibold mb-4">
           Name: {userName}
         </StyledText>
 
+        {/* Service selection */}
         <StyledText className="font-bold mb-2">Services</StyledText>
         <StyledTouchableOpacity
           className="h-10 border border-gray-300 rounded justify-center px-2 mb-4 bg-white"
@@ -265,6 +289,7 @@ function Booking({ onBack }: { onBack: any }) {
           </StyledText>
         </StyledTouchableOpacity>
 
+        {/* Modal for service selection */}
         <Modal visible={serviceModalVisible} animationType="slide">
           <StyledView className="flex-1 justify-center p-5">
             <Picker
@@ -294,6 +319,7 @@ function Booking({ onBack }: { onBack: any }) {
           </StyledView>
         </Modal>
 
+        {/* Location selection */}
         <StyledText className="font-bold mb-2">Location</StyledText>
         <StyledTouchableOpacity
           className="h-10 border border-gray-300 rounded justify-center px-2 mb-4 bg-white"
@@ -304,6 +330,7 @@ function Booking({ onBack }: { onBack: any }) {
           </StyledText>
         </StyledTouchableOpacity>
 
+        {/* Modal for location selection */}
         <Modal visible={locationModalVisible} animationType="slide">
           <StyledView className="flex-1 justify-center p-5">
             <Picker
@@ -329,6 +356,7 @@ function Booking({ onBack }: { onBack: any }) {
           </StyledView>
         </Modal>
 
+        {/* Date selection */}
         <StyledText className="font-bold mb-2">Date</StyledText>
         <StyledTouchableOpacity
           className="h-10 border border-gray-300 rounded justify-center px-2 mb-4 bg-white"
@@ -349,6 +377,7 @@ function Booking({ onBack }: { onBack: any }) {
           />
         )}
 
+        {/* Time selection */}
         <StyledText className="font-bold mb-2">Time</StyledText>
         <StyledTouchableOpacity
           className="h-10 border border-gray-300 rounded justify-center px-2 mb-4 bg-white"
@@ -359,6 +388,7 @@ function Booking({ onBack }: { onBack: any }) {
           </StyledText>
         </StyledTouchableOpacity>
 
+        {/* Modal for time selection */}
         <Modal visible={timeModalVisible} animationType="slide">
           <StyledView className="flex-1 justify-center p-5">
             <Picker
@@ -388,6 +418,7 @@ function Booking({ onBack }: { onBack: any }) {
           </StyledView>
         </Modal>
 
+        {/* Remarks input field */}
         <StyledText className="font-bold mb-2">Remarks</StyledText>
         <StyledTextInput
           placeholder="Remarks"
@@ -396,6 +427,7 @@ function Booking({ onBack }: { onBack: any }) {
           onChangeText={(text) => setRemarks(text)}
         />
 
+        {/* Symptom selection with radio buttons */}
         <StyledText className="font-bold mb-2">
           Do you have any of the following symptoms:
         </StyledText>
@@ -412,6 +444,7 @@ function Booking({ onBack }: { onBack: any }) {
           animation={true}
         />
 
+        {/* Allergy selection with radio buttons */}
         <StyledText className="font-bold mb-2 mt-4">
           Any drug allergy?
         </StyledText>
@@ -425,6 +458,7 @@ function Booking({ onBack }: { onBack: any }) {
           animation={true}
         />
 
+        {/* Input field for allergy details if 'Yes' is selected */}
         {allergy === 1 && (
           <StyledTextInput
             placeholder="If yes, please state the details"
@@ -434,6 +468,7 @@ function Booking({ onBack }: { onBack: any }) {
           />
         )}
 
+        {/* Button to save appointment */}
         <StyledTouchableOpacity
           className="bg-customBlue py-2 rounded mt-5"
           onPress={handleSaveAppointment}
@@ -443,6 +478,7 @@ function Booking({ onBack }: { onBack: any }) {
           </StyledText>
         </StyledTouchableOpacity>
 
+        {/* Button to go back to booked appointments */}
         <StyledTouchableOpacity
           className="bg-customBlue2 py-2 rounded mt-5"
           onPress={onBack}
@@ -457,14 +493,17 @@ function Booking({ onBack }: { onBack: any }) {
     </StyledSafeAreaView>
   );
 }
+
+// Component to display booked appointments
 const BookedAppointments = ({ onClose }: { onClose: any }) => {
-  const db = useSQLiteContext();
-  const [appointments, setAppointments] = useState<any[]>([]);
+  const db = useSQLiteContext(); // Access SQLite database context
+  const [appointments, setAppointments] = useState<any[]>([]); // State to store fetched appointments
 
   useEffect(() => {
     fetchAppointments();
   }, []);
 
+  // Fetch appointments from the local SQLite database
   const fetchAppointments = async () => {
     try {
       const result = await db.getAllSync(
@@ -477,6 +516,7 @@ const BookedAppointments = ({ onClose }: { onClose: any }) => {
     }
   };
 
+  // Function to delete an appointment
   const deleteAppointment = async (id: number) => {
     try {
       await db.runAsync("DELETE FROM appointments WHERE id = ?;", [id]);
@@ -487,6 +527,7 @@ const BookedAppointments = ({ onClose }: { onClose: any }) => {
     }
   };
 
+  // Confirmation dialog for deleting an appointment
   const confirmDeleteAppointment = (id: number) => {
     Alert.alert(
       "Confirm Deletion",
@@ -503,6 +544,7 @@ const BookedAppointments = ({ onClose }: { onClose: any }) => {
     );
   };
 
+  // Component rendering for booked appointments
   return (
     <StyledSafeAreaView className="flex-1 bg-gray-100">
       <StyledScrollView className="p-5">
@@ -524,6 +566,7 @@ const BookedAppointments = ({ onClose }: { onClose: any }) => {
                 <StyledText className="text-white text-lg">✖️</StyledText>
               </TouchableOpacity>
 
+              {/* Display appointment details */}
               <StyledText className="font-bold mb-2">
                 Service: {appointment.service}
               </StyledText>
@@ -543,6 +586,7 @@ const BookedAppointments = ({ onClose }: { onClose: any }) => {
           </StyledText>
         )}
 
+        {/* Button to make a new appointment */}
         <StyledTouchableOpacity
           className="bg-customBlue py-2 rounded mt-5"
           onPress={onClose}

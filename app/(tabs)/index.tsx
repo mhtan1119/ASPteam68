@@ -1,29 +1,35 @@
+// Import necessary modules and components from React and React Native
 import React, { useEffect, useState, useCallback } from "react";
 import { View, Text, TouchableOpacity, Modal, ScrollView } from "react-native";
 import {
   useFocusEffect,
   useNavigation,
   NavigationProp,
-} from "@react-navigation/native";
-import { SQLiteProvider, useSQLiteContext } from "expo-sqlite";
-import { styled } from "nativewind";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { StatusBar } from "expo-status-bar";
-import Checkbox from "expo-checkbox";
-import moment from "moment";
+} from "@react-navigation/native"; // Import navigation hooks
+import { SQLiteProvider, useSQLiteContext } from "expo-sqlite"; // Import SQLite components for local database management
+import { styled } from "nativewind"; // Import styled components for Tailwind-like styling
+import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage for local data storage
+import { StatusBar } from "expo-status-bar"; // Import StatusBar for handling status bar styling
+import Checkbox from "expo-checkbox"; // Import Checkbox component
+import moment from "moment"; // Import moment for date handling
 
+// Define the type for navigation stack parameters
 type RootStackParamList = {
   booking: undefined; // Add more routes as needed
   medtracking: undefined;
 };
 
+// Define styled components for consistent styling
 const StyledView = styled(View);
 const StyledText = styled(Text);
 const StyledTouchableOpacity = styled(TouchableOpacity);
 
+// Main component for the user list screen
 const UserListScreen: React.FC = () => {
-  const db = useSQLiteContext();
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const db = useSQLiteContext(); // Access SQLite database context
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>(); // Hook for navigation
+
+  // State for storing the next appointment details
   const [nextAppointment, setNextAppointment] = useState<{
     service: string | number | (string | number)[] | null | undefined;
     location: string | number | (string | number)[] | null | undefined;
@@ -31,8 +37,9 @@ const UserListScreen: React.FC = () => {
     date: string;
     time: string;
   } | null>(null);
-  const [isVisible, setIsVisible] = useState(true);
-  const [modalVisible, setModalVisible] = useState(false); // For showing the pop-up
+
+  const [isVisible, setIsVisible] = useState(true); // State for controlling visibility of the next appointment notification
+  const [modalVisible, setModalVisible] = useState(false); // State for controlling the visibility of the modal
   const [medications, setMedications] = useState<
     {
       id: number;
@@ -41,9 +48,9 @@ const UserListScreen: React.FC = () => {
       unit: string;
       dosageForm: string;
       time: string;
-      status: string; // New status field
+      status: string; // Status field for medication
     }[]
-  >([]); // Store today's medications
+  >([]); // State for storing today's medications
 
   const [recentlyTakenPills, setRecentlyTakenPills] = useState<
     {
@@ -54,10 +61,11 @@ const UserListScreen: React.FC = () => {
       dosageForm: string;
       time: string;
       date: string;
-      status: string; // New status field
+      status: string; // Status field for recently taken pills
     }[]
-  >([]); // Store the recently taken pills that are ticked
+  >([]); // State for storing the recently taken pills that are ticked
 
+  // State for storing user profile information
   const [userProfile, setUserProfile] = useState<{
     age: number;
     allergies: string;
@@ -66,8 +74,9 @@ const UserListScreen: React.FC = () => {
     weight: string;
   } | null>(null);
 
-  const [currentDateTime, setCurrentDateTime] = useState<string>("");
+  const [currentDateTime, setCurrentDateTime] = useState<string>(""); // State for storing the current date and time
 
+  // Function to fetch the next appointment from the local SQLite database
   const fetchAppointments = async () => {
     try {
       const result = await db.getAllAsync(
@@ -82,7 +91,7 @@ const UserListScreen: React.FC = () => {
       }));
 
       if (appointmentList.length > 0) {
-        setNextAppointment(appointmentList[0]);
+        setNextAppointment(appointmentList[0]); // Set the next appointment if found
       } else {
         setNextAppointment(null); // Clear the appointment if no future appointments are found
       }
@@ -91,6 +100,7 @@ const UserListScreen: React.FC = () => {
     }
   };
 
+  // Function to fetch today's medications from the local SQLite database
   const fetchTodaysMedications = async () => {
     try {
       const today = moment().format("dddd"); // Get the day in text format (e.g., "Monday")
@@ -111,6 +121,8 @@ const UserListScreen: React.FC = () => {
       console.log("Error fetching today's medications:", error);
     }
   };
+
+  // Function to fetch recently taken pills from the local SQLite database
   const fetchRecentlyTakenPills = async () => {
     try {
       const result: {
@@ -131,6 +143,7 @@ const UserListScreen: React.FC = () => {
     }
   };
 
+  // Function to calculate the user's age based on their date of birth
   const calculateAge = (dob: Date) => {
     const today = new Date();
     const birthDate = new Date(dob);
@@ -145,12 +158,13 @@ const UserListScreen: React.FC = () => {
     return age;
   };
 
+  // Function to fetch the user's profile from AsyncStorage
   const fetchUserProfile = async () => {
     try {
       const profileData = await AsyncStorage.getItem("userProfile");
       if (profileData) {
         const data = JSON.parse(profileData);
-        const age = calculateAge(new Date(data.dateOfBirth));
+        const age = calculateAge(new Date(data.dateOfBirth)); // Calculate age based on the date of birth
         setUserProfile({
           age,
           allergies: data.allergies || "N/A",
@@ -164,6 +178,7 @@ const UserListScreen: React.FC = () => {
     }
   };
 
+  // Function to toggle the status of a medication between tick, cross, and empty
   const toggleMedicationStatus = async (id: number, currentStatus: string) => {
     const newStatus =
       currentStatus === "tick"
@@ -189,15 +204,17 @@ const UserListScreen: React.FC = () => {
     }
   };
 
+  // Effect to run when the screen is focused
   useFocusEffect(
     useCallback(() => {
-      fetchAppointments();
-      fetchTodaysMedications(); // Fetch today's medications whenever the screen is focused
-      fetchRecentlyTakenPills(); // Fetch recently taken pills that are ticked
-      fetchUserProfile();
+      fetchAppointments(); // Fetch next appointment
+      fetchTodaysMedications(); // Fetch today's medications
+      fetchRecentlyTakenPills(); // Fetch recently taken pills
+      fetchUserProfile(); // Fetch user profile
     }, [])
   );
 
+  // Effect to update the current date and time every second
   useEffect(() => {
     const intervalId = setInterval(() => {
       const now = new Date();
@@ -208,17 +225,18 @@ const UserListScreen: React.FC = () => {
   }, []);
 
   const handleClose = () => {
-    setIsVisible(false);
+    setIsVisible(false); // Close the next appointment notification
   };
 
   const handleShowModal = () => {
-    setModalVisible(true);
+    setModalVisible(true); // Show the appointment details modal
   };
 
   const handleCloseModal = () => {
-    setModalVisible(false);
+    setModalVisible(false); // Close the appointment details modal
   };
 
+  // Component rendering starts here
   return (
     <StyledView className="flex-1 flex-col py-10 bg-white">
       <StatusBar style="dark" />
@@ -240,6 +258,7 @@ const UserListScreen: React.FC = () => {
             </StyledTouchableOpacity>
           </StyledView>
         )}
+
         {/* Modal for showing appointment details */}
         <Modal
           visible={modalVisible}
@@ -279,7 +298,7 @@ const UserListScreen: React.FC = () => {
           </StyledView>
         </Modal>
 
-        {/* Rest of the content */}
+        {/* Health summary and medication information */}
         <StyledView className="flex-row justify-between border-y-2 bg-customBlue mt-16">
           {/* Added mt-16 to adjust for the notification bar */}
           <Text className="ml-4 my-4 text-3xl font-bold">Health Summary</Text>
@@ -325,6 +344,7 @@ const UserListScreen: React.FC = () => {
           ))}
         </StyledView>
 
+        {/* Recently taken pills section */}
         <StyledView className="border-y-2 bg-customBlue">
           <Text className="ml-4 my-4 text-3xl font-bold">
             Recently Taken Pills
@@ -350,6 +370,7 @@ const UserListScreen: React.FC = () => {
   );
 };
 
+// App component that wraps UserListScreen with the SQLiteProvider
 const App: React.FC = () => {
   return (
     <SQLiteProvider databaseName="data.db">

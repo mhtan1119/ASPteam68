@@ -1,3 +1,4 @@
+// Import necessary modules and components from React and React Native
 import React, { useState, useRef, useEffect } from "react";
 import {
   View,
@@ -9,9 +10,9 @@ import {
   Keyboard,
   Modal,
 } from "react-native";
-import MapView, { Marker, Callout, Region } from "react-native-maps";
-import { ThemedView } from "@/components/ThemedView";
-import Ionicons from "react-native-vector-icons/Ionicons";
+import MapView, { Marker, Callout, Region } from "react-native-maps"; // Import MapView components for map display
+import { ThemedView } from "@/components/ThemedView"; // Import custom themed view component
+import Ionicons from "react-native-vector-icons/Ionicons"; // Import Ionicons for icons
 import {
   HospitalLocation,
   allLocations,
@@ -19,8 +20,8 @@ import {
   privateHospitals,
   publicHospitals,
   services,
-} from "@/constants/hospitalData";
-import { useRouter } from "expo-router";
+} from "@/constants/hospitalData"; // Import hospital data constants
+import { useRouter } from "expo-router"; // Import router for navigation
 
 // Define the Location interface
 interface Location {
@@ -33,7 +34,9 @@ interface Location {
   services?: string[];
 }
 
+// Main component for the map screen
 export default function MapScreen() {
+  // State for controlling the region of the map
   const [region, setRegion] = useState<Region>({
     latitude: 1.3521,
     longitude: 103.8198,
@@ -41,15 +44,18 @@ export default function MapScreen() {
     longitudeDelta: 0.0421,
   });
 
-  const [searchQuery, setSearchQuery] = useState("");
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const [filteredLocations, setFilteredLocations] = useState<Location[]>([]);
-  const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
-  const [modalVisible, setModalVisible] = useState(false);
-  const mapRef = useRef<MapView>(null);
-  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState(""); // State for search query input
+  const [showDropdown, setShowDropdown] = useState(false); // State to control dropdown visibility
+  const [isDragging, setIsDragging] = useState(false); // State to track if the map is being dragged
+  const [filteredLocations, setFilteredLocations] = useState<Location[]>([]); // State for filtered locations
+  const [selectedLocation, setSelectedLocation] = useState<Location | null>(
+    null
+  ); // State for the currently selected location
+  const [modalVisible, setModalVisible] = useState(false); // State to control modal visibility
+  const mapRef = useRef<MapView>(null); // Reference for the map component
+  const router = useRouter(); // Hook for navigation
 
+  // Function to zoom in the map
   const zoomIn = () => {
     const newRegion = {
       ...region,
@@ -58,10 +64,11 @@ export default function MapScreen() {
     };
     setRegion(newRegion);
     if (mapRef.current) {
-      mapRef.current.animateToRegion(newRegion, 500);
+      mapRef.current.animateToRegion(newRegion, 500); // Animate map to new region
     }
   };
 
+  // Function to zoom out the map
   const zoomOut = () => {
     const newRegion = {
       ...region,
@@ -70,10 +77,11 @@ export default function MapScreen() {
     };
     setRegion(newRegion);
     if (mapRef.current) {
-      mapRef.current.animateToRegion(newRegion, 500);
+      mapRef.current.animateToRegion(newRegion, 500); // Animate map to new region
     }
   };
 
+  // Function to recenter the map to default coordinates
   const recenterMap = () => {
     const defaultRegion = {
       latitude: 1.3521,
@@ -83,14 +91,16 @@ export default function MapScreen() {
     };
     setRegion(defaultRegion);
     if (mapRef.current) {
-      mapRef.current.animateToRegion(defaultRegion, 500);
+      mapRef.current.animateToRegion(defaultRegion, 500); // Animate map to default region
     }
   };
 
+  // Effect to initialize the filtered locations with all locations on component mount
   useEffect(() => {
     setFilteredLocations(allLocations);
   }, []);
 
+  // Function to handle location selection from the dropdown
   const handleSelectLocation = (location: Location) => {
     setRegion({
       ...region,
@@ -114,6 +124,7 @@ export default function MapScreen() {
     }
   };
 
+  // Function to handle screen press to hide dropdown and dismiss keyboard
   const handleScreenPress = () => {
     if (!isDragging) {
       setShowDropdown(false);
@@ -121,11 +132,13 @@ export default function MapScreen() {
     }
   };
 
+  // Function to clear the search input
   const clearSearch = () => {
     setSearchQuery("");
     setShowDropdown(false);
   };
 
+  // Functions to filter locations based on type
   const showPolyclinicsOnly = () => {
     setFilteredLocations(polyclinics);
   };
@@ -142,22 +155,26 @@ export default function MapScreen() {
     setFilteredLocations(allLocations);
   };
 
+  // Function to get random services for displaying in the modal
   const getRandomServices = (num: number) => {
     const shuffled = [...services].sort(() => 0.5 - Math.random());
     return shuffled.slice(0, num);
   };
 
+  // Function to open the modal with selected location details
   const openModal = (location: Location) => {
     const selectedServices = getRandomServices(3);
     setSelectedLocation({ ...location, services: selectedServices });
     setModalVisible(true);
   };
 
+  // Function to close the modal
   const closeModal = () => {
     setModalVisible(false);
     setSelectedLocation(null);
   };
 
+  // Function to handle booking an appointment
   const handleBookAppointment = (locationName: string) => {
     closeModal();
     router.push({
@@ -169,12 +186,14 @@ export default function MapScreen() {
     });
   };
 
+  // Component rendering starts here
   return (
     <TouchableWithoutFeedback onPress={handleScreenPress}>
       <ThemedView className="flex-1 bg-customBlue">
         <View className="mt-28 mx-2">
           <Text className="text-lg font-bold text-black">Search</Text>
         </View>
+        {/* Search bar */}
         <View className="mt-2 flex-row items-center bg-white rounded-lg p-2 shadow-lg">
           <Ionicons name="search" size={20} color="#888" className="mr-2" />
           <TextInput
@@ -205,6 +224,8 @@ export default function MapScreen() {
             </TouchableOpacity>
           )}
         </View>
+
+        {/* Dropdown for search results */}
         {showDropdown && (
           <FlatList
             data={filteredLocations}
@@ -220,6 +241,8 @@ export default function MapScreen() {
             )}
           />
         )}
+
+        {/* Map component */}
         <MapView
           ref={mapRef}
           className="flex-1 mt-5"
@@ -228,8 +251,8 @@ export default function MapScreen() {
           onPanDrag={() => setIsDragging(true)}
           onTouchStart={() => setIsDragging(false)}
           onTouchEnd={() => setTimeout(() => setIsDragging(false), 300)}
-          testID="map-view"
         >
+          {/* User's current location marker */}
           <Marker
             coordinate={{
               latitude: 1.3521,
@@ -239,6 +262,7 @@ export default function MapScreen() {
             <Ionicons name="person-circle" size={40} color="white" />
           </Marker>
 
+          {/* Markers for all filtered locations */}
           {filteredLocations.map((location, index) => (
             <Marker
               key={index}
@@ -273,6 +297,8 @@ export default function MapScreen() {
             </Marker>
           ))}
         </MapView>
+
+        {/* Control buttons for map interaction */}
         <View className="absolute bottom-5 left-5 space-y-2">
           <TouchableOpacity
             className="w-12 h-12 bg-white/80 rounded-full items-center justify-center shadow-lg mb-2"
@@ -294,6 +320,7 @@ export default function MapScreen() {
           </TouchableOpacity>
         </View>
 
+        {/* Buttons for filtering location types */}
         <View className="absolute top-10 left-5 items-center">
           <TouchableOpacity
             className="w-12 h-12 bg-green-500 rounded-full justify-center items-center shadow-lg"
@@ -334,6 +361,7 @@ export default function MapScreen() {
           <Text className="mt-1 text-sm text-black">All Locations</Text>
         </View>
 
+        {/* Modal for showing location details */}
         {selectedLocation && (
           <Modal
             animationType="slide"

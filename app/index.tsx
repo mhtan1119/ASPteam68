@@ -1,3 +1,4 @@
+// Import necessary modules and components from React, React Native, and other libraries
 import React, { useState } from "react";
 import {
   Text,
@@ -10,23 +11,27 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from "react-native";
-import Icon from "react-native-vector-icons/MaterialIcons";
-import { Checkbox } from "react-native-paper";
-import { SQLiteProvider, useSQLiteContext } from "expo-sqlite";
-import { router } from "expo-router";
-import { styled } from "nativewind";
-
+import Icon from "react-native-vector-icons/MaterialIcons"; // Import MaterialIcons for icons
+import { Checkbox } from "react-native-paper"; // Import Checkbox component
+import { SQLiteProvider, useSQLiteContext } from "expo-sqlite"; // Import SQLite for local database management
+import { router } from "expo-router"; // Import router for navigation
+import { styled } from "nativewind"; // Import styled components for NativeWind
 
 // Custom Checkbox Component
-const CustomCheckbox: React.FC<{ checked: boolean; onPress: () => void }> = ({ checked, onPress }) => (
+const CustomCheckbox: React.FC<{ checked: boolean; onPress: () => void }> = ({
+  checked,
+  onPress,
+}) => (
   <TouchableOpacity onPress={onPress} style={styles.checkboxContainer}>
     <View style={styles.checkbox}>
-      {checked && <Icon name="check" size={18} color="#FFF" style={styles.checkmark} />}
+      {checked && (
+        <Icon name="check" size={18} color="#FFF" style={styles.checkmark} />
+      )}
     </View>
   </TouchableOpacity>
 );
 
-// Initialize the database
+// Initialize the SQLite database
 const initializeDatabase = async (db: any) => {
   try {
     await db.execAsync(`
@@ -37,30 +42,33 @@ const initializeDatabase = async (db: any) => {
         password TEXT
       );
     `);
-    console.log("Database initialized!");
+    console.log("Database initialized!"); // Log success message
   } catch (error) {
-    console.log("Error while initializing the database:", error);
+    console.log("Error while initializing the database:", error); // Log error message if initialization fails
   }
 };
 
+// Main Login component
 export default function Login() {
   const [currentScreen, setCurrentScreen] = useState<
     "Login" | "Register" | "Home"
-  >("Login");
-  const [userName, setUserName] = useState("");
+  >("Login"); // State to manage the current screen
+  const [userName, setUserName] = useState(""); // State to store the username
 
+  // Function to handle navigation between screens
   const handleNavigation = (
     screen: "Login" | "Register" | "Home",
     user?: string
   ) => {
-    setCurrentScreen(screen);
+    setCurrentScreen(screen); // Update the current screen state
     if (user) {
-      setUserName(user);
+      setUserName(user); // Update the username state if provided
     }
   };
 
   return (
     <SQLiteProvider databaseName="data.db" onInit={initializeDatabase}>
+      {/* Render the appropriate screen based on the currentScreen state */}
       {currentScreen === "Login" && <LoginScreen navigate={handleNavigation} />}
       {currentScreen === "Register" && (
         <RegisterScreen navigate={handleNavigation} />
@@ -76,20 +84,23 @@ export default function Login() {
 const LoginScreen: React.FC<{
   navigate: (screen: "Login" | "Register" | "Home", user?: string) => void;
 }> = ({ navigate }) => {
-  const db = useSQLiteContext();
-  const [userName, setUserName] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
-  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const db = useSQLiteContext(); // Access SQLite context
+  const [userName, setUserName] = useState(""); // State to store the username input
+  const [password, setPassword] = useState(""); // State to store the password input
+  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
+  const [rememberMe, setRememberMe] = useState(false); // State to manage "Remember Me" option
+  const [passwordError, setPasswordError] = useState<string | null>(null); // State to store password error message
 
+  // Function to validate the password
   const validatePassword = (password: string): boolean => {
-    const passwordRegex = /^(?=.*[A-Z])(?=.*[\W_]).{8,}$/;
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[\W_]).{8,}$/; // Regex pattern for password validation
     return passwordRegex.test(password);
   };
 
+  // Function to handle login
   const handleLogin = async () => {
     if (!validatePassword(password)) {
+      // Validate password format
       setPasswordError(
         "Password must be at least 8 characters long and include at least one uppercase letter and one special character."
       );
@@ -98,6 +109,7 @@ const LoginScreen: React.FC<{
     setPasswordError(""); // Clear the error message if validation passes
 
     if (userName.length === 0 || password.length === 0) {
+      // Check for empty fields
       Alert.alert("Attention", "Please enter both email and password");
       return;
     }
@@ -105,7 +117,7 @@ const LoginScreen: React.FC<{
       const user = await db.getFirstAsync(
         "SELECT * FROM users WHERE username = ?",
         [userName]
-      );
+      ); // Check if the username exists
       if (!user) {
         Alert.alert("Error", "username does not exist!");
         return;
@@ -113,7 +125,7 @@ const LoginScreen: React.FC<{
       const validUser = await db.getFirstAsync(
         "SELECT * FROM users WHERE username = ? AND password = ?",
         [userName, password]
-      );
+      ); // Validate username and password
       if (validUser) {
         Alert.alert("Success", "Login successful");
         router.navigate("/(tabs)/");
@@ -123,10 +135,11 @@ const LoginScreen: React.FC<{
         Alert.alert("Error", "Incorrect password");
       }
     } catch (error) {
-      console.log("Error during login:", error);
+      console.log("Error during login:", error); // Log error if login fails
     }
   };
 
+  // Function to handle forgot password
   const handleForgotPassword = () => {
     Alert.alert(
       "Forgot Password",
@@ -134,10 +147,12 @@ const LoginScreen: React.FC<{
     );
   };
 
+  // Component rendering for LoginScreen
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View className="flex-1 justify-center p-4 bg-white items-center mt-[-50px]">
         <Text className="text-[#3F5F90] text-2xl font-bold mb-6">Login</Text>
+        {/* Email Input */}
         <View className="w-4/5 my-1">
           <Text className="font-bold text-lg mb-1">Email</Text>
           <TextInput
@@ -149,6 +164,7 @@ const LoginScreen: React.FC<{
             autoCapitalize="none"
           />
         </View>
+        {/* Password Input */}
         <View className="w-4/5 my-1">
           <Text className="font-bold text-lg mb-1">Password</Text>
           <View className="flex-row items-center border border-gray-300 rounded px-2">
@@ -171,21 +187,27 @@ const LoginScreen: React.FC<{
             <Text className="text-red-500 text-sm mt-2">{`* ${passwordError}`}</Text>
           ) : null}
         </View>
+        {/* Remember Me and Forgot Password */}
         <View className="w-4/5 flex-row justify-between items-center">
-        <View className="flex-row items-center">
-          <CustomCheckbox checked={rememberMe} onPress={() => setRememberMe(!rememberMe)} />
-          <Text className="text-gray-700">Remember Me</Text>
-        </View>
+          <View className="flex-row items-center">
+            <CustomCheckbox
+              checked={rememberMe}
+              onPress={() => setRememberMe(!rememberMe)}
+            />
+            <Text className="text-gray-700">Remember Me</Text>
+          </View>
           <TouchableOpacity onPress={handleForgotPassword}>
             <Text className="text-[#007BFF] text-sm">Forgot Password?</Text>
           </TouchableOpacity>
         </View>
+        {/* Login Button */}
         <Pressable
           className="w-4/5 p-3 bg-customBlue2 rounded mt-3 items-center"
           onPress={handleLogin}
         >
           <Text className="text-white text-lg font-bold">Login</Text>
         </Pressable>
+        {/* Sign Up Link */}
         <View className="flex-row mt-5">
           <Text className="text-base text-gray-500">
             Don't have an account?
@@ -203,22 +225,25 @@ const LoginScreen: React.FC<{
 const RegisterScreen: React.FC<{
   navigate: (screen: "Login" | "Register" | "Home", user?: string) => void;
 }> = ({ navigate }) => {
-  const db = useSQLiteContext();
-  const [userName, setUserName] = useState("");
-  const [password, setPassword] = useState("");
-  const [repeatPassword, setRepeatPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [showRepeatPassword, setShowRepeatPassword] = useState(false);
-  const [passwordValid, setPasswordValid] = useState(true);
-  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const db = useSQLiteContext(); // Access SQLite context
+  const [userName, setUserName] = useState(""); // State to store the username input
+  const [password, setPassword] = useState(""); // State to store the password input
+  const [repeatPassword, setRepeatPassword] = useState(""); // State to store repeated password input
+  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
+  const [showRepeatPassword, setShowRepeatPassword] = useState(false); // State to toggle repeat password visibility
+  const [passwordValid, setPasswordValid] = useState(true); // State to validate password
+  const [passwordError, setPasswordError] = useState<string | null>(null); // State to store password error message
 
+  // Function to validate the password
   const validatePassword = (password: string) => {
-    const passwordRegex = /^(?=.*[A-Z])(?=.*[\W_]).{8,}$/;
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[\W_]).{8,}$/; // Regex pattern for password validation
     return passwordRegex.test(password);
   };
 
+  // Function to handle registration
   const handleRegister = async () => {
     if (password !== repeatPassword) {
+      // Check if passwords match
       Alert.alert("Sign Up Failed", "Passwords do not match.");
       return;
     }
@@ -227,11 +252,13 @@ const RegisterScreen: React.FC<{
       password.length === 0 ||
       repeatPassword.length === 0
     ) {
+      // Check for empty fields
       Alert.alert("Attention!", "Please enter all the fields.");
       return;
     }
 
     if (!validatePassword(password)) {
+      // Validate password format
       setPasswordError(
         "Password must be at least 8 characters long and include at least one uppercase letter and one special character."
       );
@@ -243,7 +270,7 @@ const RegisterScreen: React.FC<{
       const existingUser = await db.getFirstAsync(
         "SELECT * FROM users WHERE username = ?",
         [userName]
-      );
+      ); // Check if the username already exists
       if (existingUser) {
         Alert.alert("Error", "username already exists.");
         return;
@@ -252,18 +279,20 @@ const RegisterScreen: React.FC<{
       await db.runAsync(
         "INSERT INTO users (username, password) VALUES (?, ?)",
         [userName, password]
-      );
+      ); // Insert new user into the database
       Alert.alert("Success", "Registration successful!");
       router.navigate("/(tabs)/");
     } catch (error) {
-      console.log("Error during registration:", error);
+      console.log("Error during registration:", error); // Log error if registration fails
     }
   };
 
+  // Component rendering for RegisterScreen
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View className="flex-1 justify-center p-4 bg-white items-center mt-[-50px]">
         <Text className="text-[#3F5F90] text-2xl font-bold mb-6">Sign Up</Text>
+        {/* Email Input */}
         <View className="w-4/5 my-1">
           <Text className="font-bold text-lg mb-1">Email</Text>
           <TextInput
@@ -275,6 +304,7 @@ const RegisterScreen: React.FC<{
             autoCapitalize="none"
           />
         </View>
+        {/* Password Input */}
         <View className="w-4/5 my-1">
           <Text className="font-bold text-lg mb-1">Password</Text>
           <View className="flex-row items-center border border-gray-300 rounded px-2">
@@ -300,6 +330,7 @@ const RegisterScreen: React.FC<{
             <Text className="text-red-500 text-sm mt-2">{`* ${passwordError}`}</Text>
           ) : null}
         </View>
+        {/* Repeat Password Input */}
         <View className="w-4/5 my-1">
           <Text className="font-bold text-lg mb-1">Repeat Password</Text>
           <View className="flex-row items-center border border-gray-300 rounded px-2">
@@ -321,12 +352,14 @@ const RegisterScreen: React.FC<{
             </TouchableOpacity>
           </View>
         </View>
+        {/* Sign Up Button */}
         <Pressable
           className="w-4/5 p-3 bg-customBlue2 rounded mt-3 items-center"
           onPress={handleRegister}
         >
           <Text className="text-white text-lg font-bold">Sign Up</Text>
         </Pressable>
+        {/* Login Link */}
         <View className="flex-row mt-5">
           <Text className="text-base text-gray-500">
             Already have an account?
@@ -351,6 +384,7 @@ const HomeScreen: React.FC<{
         <Text className="text-[#3F5F90] text-2xl font-bold mb-6">
           Welcome, {user}
         </Text>
+        {/* Logout Button */}
         <Pressable
           className="w-4/5 p-3 bg-customBlue2 rounded mt-3 items-center"
           onPress={() => navigate("Login")}
@@ -361,33 +395,34 @@ const HomeScreen: React.FC<{
     </TouchableWithoutFeedback>
   );
 };
-// Styles
+
+// Styles for components
 const styles = StyleSheet.create({
   checkboxRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     marginBottom: 15,
   },
   checkboxContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginRight: 10,
   },
   checkbox: {
     width: 20,
     height: 20,
     borderWidth: 1,
-    borderColor: '#3F5F90',
+    borderColor: "#3F5F90",
     borderRadius: 3,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   checkboxChecked: {
-    backgroundColor: '#3F5F90',
+    backgroundColor: "#3F5F90",
   },
   checkmark: {
-    color: '#3F5F90',
+    color: "#3F5F90",
     fontSize: 14,
     lineHeight: 20,
   },
@@ -396,10 +431,10 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
   forgotPassword: {
-    color: '#007BFF',
+    color: "#007BFF",
     fontSize: 14,
   },
   checkboxLabel: {
     marginLeft: 8,
   },
-})
+});

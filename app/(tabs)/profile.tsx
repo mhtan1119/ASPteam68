@@ -1,3 +1,4 @@
+// Import necessary modules and components from React and React Native
 import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
@@ -11,23 +12,24 @@ import {
   Alert,
   Image,
 } from "react-native";
-import Icon from "react-native-vector-icons/Ionicons";
-import { RadioButton } from "react-native-paper";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import { Picker } from "@react-native-picker/picker";
-import * as ImagePicker from "expo-image-picker";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import Icon from "react-native-vector-icons/Ionicons"; // Import Ionicons for icons
+import { RadioButton } from "react-native-paper"; // Import RadioButton for gender selection
+import DateTimePicker from "@react-native-community/datetimepicker"; // Import DateTimePicker for date selection
+import { Picker } from "@react-native-picker/picker"; // Import Picker for dropdowns
+import * as ImagePicker from "expo-image-picker"; // Import ImagePicker for selecting images
+import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage for local storage
 
+// Main component for the profile edit page
 const ProfileEditPage: React.FC = () => {
-  const [editing, setEditing] = useState(false);
+  const [editing, setEditing] = useState(false); // State to control edit mode
 
-  // Displayed profile state
+  // State for displayed profile information
   const [displayFullName, setDisplayFullName] = useState("");
   const [displayProfileImage, setDisplayProfileImage] = useState<string | null>(
     null
   );
 
-  // Editable profile state
+  // State for editable profile information
   const [fullName, setFullName] = useState("");
   const [selectedGender, setSelectedGender] = useState("male");
   const [dateOfBirth, setDateOfBirth] = useState(new Date());
@@ -37,15 +39,16 @@ const ProfileEditPage: React.FC = () => {
   const [allergies, setAllergies] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [address, setAddress] = useState("");
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false); // State to control date picker visibility
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [errors, setErrors] = useState({
     fullName: "",
     phoneNumber: "",
     height: "",
     weight: "",
-  });
+  }); // State to store validation errors
 
+  // Load profile data from AsyncStorage on component mount
   useEffect(() => {
     const loadProfile = async () => {
       try {
@@ -75,16 +78,19 @@ const ProfileEditPage: React.FC = () => {
     loadProfile();
   }, []);
 
+  // Handle date change from date picker
   const handleDateChange = (event: any, selectedDate?: Date) => {
     const currentDate = selectedDate || dateOfBirth;
     setShowDatePicker(false);
     setDateOfBirth(currentDate);
   };
 
+  // Handle profile save action
   const handleSave = async () => {
-    validateFullName(fullName);
-    validatePhoneNumber(phoneNumber);
+    validateFullName(fullName); // Validate full name
+    validatePhoneNumber(phoneNumber); // Validate phone number
     if (!errors.fullName && !errors.phoneNumber) {
+      // Proceed only if there are no validation errors
       try {
         const profileData = {
           fullName,
@@ -99,6 +105,7 @@ const ProfileEditPage: React.FC = () => {
           profileImage,
         };
 
+        // Save profile data to AsyncStorage
         await AsyncStorage.setItem("userProfile", JSON.stringify(profileData));
         Alert.alert("Profile Updated", "Your profile has been updated.");
         setEditing(false);
@@ -112,6 +119,7 @@ const ProfileEditPage: React.FC = () => {
     }
   };
 
+  // Handle image selection from the device's library
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -121,11 +129,12 @@ const ProfileEditPage: React.FC = () => {
     });
 
     if (!result.canceled) {
-      const imageUri = result.assets[0]?.uri;
+      const imageUri = result.assets[0]?.uri; // Get the selected image URI
       setProfileImage(imageUri);
     }
   };
 
+  // Validate full name input
   const validateFullName = (fullName: string) => {
     let error = "";
     if (fullName.trim() === "") {
@@ -137,9 +146,10 @@ const ProfileEditPage: React.FC = () => {
     }));
   };
 
+  // Validate phone number input
   const validatePhoneNumber = (phoneNumber: string) => {
     let error = "";
-    const phonePattern = /^[0-9]{8}$/;
+    const phonePattern = /^[0-9]{8}$/; // Regex for 8-digit phone number
 
     if (!phonePattern.test(phoneNumber)) {
       error = "Phone number must be exactly 8 digits.";
@@ -150,18 +160,22 @@ const ProfileEditPage: React.FC = () => {
     }));
   };
 
+  // Handle changes in full name input
   const handleFullNameChange = (text: string) => {
     setFullName(text);
     validateFullName(text);
   };
 
+  // Handle changes in phone number input
   const handlePhoneNumberChange = (text: string) => {
     setPhoneNumber(text);
     validatePhoneNumber(text);
   };
 
+  // Component rendering starts here
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      {/* Display profile or edit form based on editing state */}
       {!editing ? (
         <View style={styles.profileContainer}>
           <View style={styles.headerContainer}>
@@ -199,6 +213,7 @@ const ProfileEditPage: React.FC = () => {
         </View>
       ) : (
         <View style={styles.editView}>
+          {/* Edit profile form */}
           <Text style={styles.title}>Edit Profile</Text>
           <View style={styles.profilePicContainer}>
             <TouchableOpacity onPress={pickImage}>
@@ -210,6 +225,7 @@ const ProfileEditPage: React.FC = () => {
               />
             </TouchableOpacity>
           </View>
+          {/* Full Name Input */}
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Full Name</Text>
             <TextInput
@@ -222,30 +238,37 @@ const ProfileEditPage: React.FC = () => {
               <Text style={styles.errorText}>{errors.fullName}</Text>
             )}
           </View>
-          <View style={styles.inputContainer}>
-          <Text style={styles.label}>Gender</Text>
-<View style={styles.radioContainer}>
-  <TouchableOpacity
-    style={styles.radioButton}
-    onPress={() => setSelectedGender('male')}
-  >
-    <View style={styles.radioCircle}>
-      {selectedGender === 'male' && <View style={styles.selectedInnerCircle} />}
-    </View>
-    <Text style={styles.radioText}>Male</Text>
-  </TouchableOpacity>
-  <TouchableOpacity
-    style={styles.radioButton}
-    onPress={() => setSelectedGender('female')}
-  >
-    <View style={styles.radioCircle}>
-      {selectedGender === 'female' && <View style={styles.selectedInnerCircle} />}
-    </View>
-    <Text style={styles.radioText}>Female</Text>
-  </TouchableOpacity>
-</View>
-</View>
 
+          {/* Gender Selection */}
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Gender</Text>
+            <View style={styles.radioContainer}>
+              <TouchableOpacity
+                style={styles.radioButton}
+                onPress={() => setSelectedGender("male")}
+              >
+                <View style={styles.radioCircle}>
+                  {selectedGender === "male" && (
+                    <View style={styles.selectedInnerCircle} />
+                  )}
+                </View>
+                <Text style={styles.radioText}>Male</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.radioButton}
+                onPress={() => setSelectedGender("female")}
+              >
+                <View style={styles.radioCircle}>
+                  {selectedGender === "female" && (
+                    <View style={styles.selectedInnerCircle} />
+                  )}
+                </View>
+                <Text style={styles.radioText}>Female</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Date of Birth Input */}
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Date of Birth</Text>
             <TouchableOpacity
@@ -269,6 +292,8 @@ const ProfileEditPage: React.FC = () => {
               />
             )}
           </View>
+
+          {/* Height and Weight Input */}
           <View style={styles.rowContainer}>
             <View style={styles.columnContainer}>
               <Text style={styles.label}>Height (cm)</Text>
@@ -297,6 +322,8 @@ const ProfileEditPage: React.FC = () => {
               )}
             </View>
           </View>
+
+          {/* Blood Type Selection */}
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Blood Type</Text>
             <View style={styles.pickerContainer}>
@@ -317,6 +344,8 @@ const ProfileEditPage: React.FC = () => {
               </Picker>
             </View>
           </View>
+
+          {/* Allergies Input */}
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Allergies</Text>
             <TextInput
@@ -328,6 +357,8 @@ const ProfileEditPage: React.FC = () => {
               multiline
             />
           </View>
+
+          {/* Phone Number Input */}
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Phone Number</Text>
             <TextInput
@@ -345,6 +376,8 @@ const ProfileEditPage: React.FC = () => {
               <Text style={styles.errorText}>{errors.phoneNumber}</Text>
             )}
           </View>
+
+          {/* Address Input */}
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Address</Text>
             <TextInput
@@ -355,6 +388,8 @@ const ProfileEditPage: React.FC = () => {
               multiline
             />
           </View>
+
+          {/* Save and Cancel Buttons */}
           <View style={styles.buttonContainer}>
             <Pressable style={styles.button} onPress={handleSave}>
               <Text style={styles.buttonText}>Save</Text>
@@ -369,6 +404,7 @@ const ProfileEditPage: React.FC = () => {
   );
 };
 
+// StyleSheet for consistent styling
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
@@ -466,7 +502,7 @@ const styles = StyleSheet.create({
     padding: 10,
     fontSize: 16,
     height: 80,
-    paddingTop: 10, // Added paddingTop for iOS
+    paddingTop: 10,
     textAlignVertical: "top",
   },
   dateInput: {
@@ -501,8 +537,8 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   picker: {
-    height: Platform.OS === 'ios' ? 50 : 40, // Adjusted height for iOS
-    justifyContent: 'center',
+    height: Platform.OS === "ios" ? 50 : 40,
+    justifyContent: "center",
     width: "100%",
     paddingLeft: 10,
   },
@@ -516,30 +552,30 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   selectedRadioButton: {
-    backgroundColor: '#e0e0e0',
+    backgroundColor: "#e0e0e0",
   },
   radioCircle: {
     height: 20,
     width: 20,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: '#333', // Default border color
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderColor: "#333",
+    alignItems: "center",
+    justifyContent: "center",
   },
   selectedRadioCircle: {
-    borderColor: '#3F5F90', // Change this color to your desired color
+    borderColor: "#3F5F90",
   },
   radioText: {
     fontSize: 16,
     marginLeft: 8,
-    color: '#333',
+    color: "#333",
   },
   selectedInnerCircle: {
     height: 10,
     width: 10,
     borderRadius: 5,
-    backgroundColor: '#3F5F90', // Inner circle color for selected state
+    backgroundColor: "#3F5F90",
   },
   buttonContainer: {
     flexDirection: "row",
@@ -554,17 +590,14 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   errorInput: {
-    borderColor: "red", // Red border to indicate an error
-    borderWidth: 1, // Border width
+    borderColor: "red",
+    borderWidth: 1,
   },
-
-  // Style for error text
   errorText: {
-    color: "red", // Red color for error text
-    fontSize: 12, // Font size
-    marginTop: 4, // Margin to separate from the input field
+    color: "red",
+    fontSize: 12,
+    marginTop: 4,
   },
-
 });
 
 export default ProfileEditPage;
