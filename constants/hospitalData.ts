@@ -1,17 +1,18 @@
 // constants/hospitalData.ts
 
-// Define the HospitalLocation interface
+// Define the HospitalLocation interface to represent the structure of hospital data
 export interface HospitalLocation {
-  name: string;
-  latitude: number;
-  longitude: number;
-  address: string;
-  hours: string;
-  phone: string;
+  name: string; // Name of the hospital or polyclinic
+  latitude: number; // Latitude for location mapping
+  longitude: number; // Longitude for location mapping
+  address: string; // Physical address of the hospital or polyclinic
+  hours: string; // Operating hours of the hospital or polyclinic
+  phone: string; // Contact phone number
 }
 
 // Polyclinics with phone numbers
 export const polyclinics: HospitalLocation[] = [
+  // List of polyclinics, each with a name, geographic coordinates, address, operating hours, and phone number
   {
     name: "Ang Mo Kio Polyclinic",
     latitude: 1.3765,
@@ -167,6 +168,7 @@ export const polyclinics: HospitalLocation[] = [
 ];
 
 // Private hospitals with phone numbers
+// List of private hospitals
 export const privateHospitals: HospitalLocation[] = [
   {
     name: "Mount Elizabeth Hospital",
@@ -251,6 +253,7 @@ export const privateHospitals: HospitalLocation[] = [
 ];
 
 // Public hospitals with phone numbers
+// List of public hospitals
 export const publicHospitals: HospitalLocation[] = [
   {
     name: "Singapore General Hospital",
@@ -316,17 +319,16 @@ export const publicHospitals: HospitalLocation[] = [
     hours: "24 hours",
     phone: "+65 6225 5554",
   },
-  // ... other public hospitals
 ];
 
 // Combine all locations into one array
 export const allLocations: HospitalLocation[] = [
-  ...polyclinics,
-  ...privateHospitals,
-  ...publicHospitals,
+  ...polyclinics, // Include all polyclinics
+  ...privateHospitals, // Include all private hospitals
+  ...publicHospitals, // Include all public hospitals
 ];
 
-// Services offered
+// Services offered at the hospitals and polyclinics
 export const services = [
   "Doctor Consultation",
   "Health Plan Discussion",
