@@ -10,6 +10,8 @@ export interface HospitalLocation {
   phone: string; // Contact phone number
 }
 
+//// Data taken from https://www.google.com/maps ////
+
 // Polyclinics with phone numbers
 export const polyclinics: HospitalLocation[] = [
   // List of polyclinics, each with a name, geographic coordinates, address, operating hours, and phone number
